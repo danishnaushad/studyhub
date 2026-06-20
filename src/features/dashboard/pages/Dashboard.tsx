@@ -118,6 +118,10 @@ export function Dashboard() {
           <DailyReflectionCard />
         </div>
       </div>
+
+      <div className="text-center text-xs text-muted-foreground mt-8 opacity-50">
+        Version Test 1
+      </div>
     </div>
   );
 }
