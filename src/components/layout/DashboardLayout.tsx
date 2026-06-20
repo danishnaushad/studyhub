@@ -8,7 +8,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
   const { theme } = useTheme();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background transition-colors duration-500 relative">
+    <div className="flex h-full overflow-hidden bg-background transition-colors duration-500 relative">
       <MidnightStars />
       
       {/* Midnight Vignette & Atmosphere */}

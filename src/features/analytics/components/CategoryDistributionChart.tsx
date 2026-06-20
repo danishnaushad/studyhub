@@ -7,14 +7,14 @@ import { getCategoryColor } from '../../../lib/colors';
 export function CategoryDistributionChart() {
   const { categoryDistribution } = useAnalytics();
 
-  // Create conic gradient string
-  let currentPercentage = 0;
-  const gradientStops = categoryDistribution.map(cat => {
-    const start = currentPercentage;
-    const end = currentPercentage + cat.percentage;
-    currentPercentage = end;
-    return `${getCategoryColor(cat.color)} ${start}% ${end}%`;
-  }).join(', ');
+  const gradientStopsArr: string[] = [];
+  categoryDistribution.reduce((acc, cat) => {
+    const start = acc;
+    const end = acc + cat.percentage;
+    gradientStopsArr.push(`${getCategoryColor(cat.color)} ${start}% ${end}%`);
+    return end;
+  }, 0);
+  const gradientStops = gradientStopsArr.join(', ');
 
   const hasData = categoryDistribution.some(cat => cat.percentage > 0);
 

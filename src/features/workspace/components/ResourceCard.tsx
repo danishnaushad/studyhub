@@ -1,6 +1,7 @@
 import { Globe, PlayCircle, FileText, GitBranch, GraduationCap, Book, ExternalLink, MoreVertical, Edit2, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '../../../components/ui/Card';
 import type { Resource, ResourceType } from '../../../types';
+import { useDemo } from '../../../contexts/DemoContext';
 import { resourcesService } from '../services/resources.service';
 
 interface ResourceCardProps {
@@ -25,6 +26,7 @@ const getIconForType = (type: ResourceType) => {
 };
 
 export function ResourceCard({ resource, onEdit, onDelete, isMenuOpen, onToggleMenu, onReadPdf }: ResourceCardProps) {
+  const { isDemo } = useDemo();
   const handleOpenResource = () => {
     resourcesService.trackResourceOpen(resource.id).catch(console.error);
     if (resource.type === 'pdf' && onReadPdf) {
@@ -93,14 +95,18 @@ export function ResourceCard({ resource, onEdit, onDelete, isMenuOpen, onToggleM
               <div className="absolute right-0 top-full mt-1 w-32 bg-popover text-popover-foreground border rounded-md shadow-md py-1 z-10" onClick={e => e.stopPropagation()}>
                 <button
                   onClick={() => onEdit(resource)}
-                  className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent flex items-center gap-2"
+                  className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent flex items-center gap-2 disabled:opacity-50"
+                  disabled={isDemo}
+                  title={isDemo ? "Disabled in Demo Mode" : undefined}
                 >
                   <Edit2 className="h-4 w-4" />
                   Edit
                 </button>
                 <button
                   onClick={() => onDelete(resource.id)}
-                  className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent text-destructive flex items-center gap-2"
+                  className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent text-destructive flex items-center gap-2 disabled:opacity-50"
+                  disabled={isDemo}
+                  title={isDemo ? "Disabled in Demo Mode" : undefined}
                 >
                   <Trash2 className="h-4 w-4" />
                   Delete

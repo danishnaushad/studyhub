@@ -86,7 +86,7 @@ export function AnalyticsSummaryCards({ categoryId }: { categoryId?: string }) {
                   {mostActiveCategory.name}
                 </span>
                 <span className="text-sm font-medium text-muted-foreground mt-0.5">
-                  {formatHours(mostActiveCategory.minutes)}
+                  {formatHours((mostActiveCategory as any).minutes)}
                 </span>
               </>
             ) : (

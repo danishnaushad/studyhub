@@ -1,12 +1,41 @@
 import { useMemo } from 'react';
 import { useFocusStore } from '../../../store/focusStore';
 import { useCategories } from '../../../hooks/useCategories';
+import { useDemo } from '../../../contexts/DemoContext';
 
 export function useAnalytics(categoryId?: string) {
   const { history } = useFocusStore();
   const { categories } = useCategories();
+  const { isDemo } = useDemo();
 
   return useMemo(() => {
+    if (isDemo) {
+      return {
+        focusMinutesToday: 35 * 60, // 35 hours
+        sessionsToday: 48,
+        weeklyFocusMinutes: 35 * 60,
+        mostActiveCategory: categories.find(c => c.name === 'Cyber Security') || { id: 'demo-cat-1', name: 'Cyber Security', color: 'blue', minutes: 1200 },
+        targetCompletionPercentage: 85,
+        weeklyTrend: [
+          { day: 'Sun', minutes: 120 }, { day: 'Mon', minutes: 200 }, { day: 'Tue', minutes: 180 },
+          { day: 'Wed', minutes: 300 }, { day: 'Thu', minutes: 250 }, { day: 'Fri', minutes: 400 },
+          { day: 'Sat', minutes: 150 }
+        ],
+        categoryDistribution: [
+          { id: 'demo-cat-1', name: 'Cyber Security', color: 'blue', percentage: 40 },
+          { id: 'demo-cat-2', name: 'Python Fundamentals', color: 'green', percentage: 30 },
+          { id: 'demo-cat-3', name: 'Web Development', color: 'yellow', percentage: 20 },
+          { id: 'demo-cat-4', name: 'Networking', color: 'purple', percentage: 10 }
+        ],
+        heatmap: Array.from({ length: 30 }).map((_, i) => ({
+          date: new Date(Date.now() - i * 86400000).toISOString().split('T')[0],
+          minutes: Math.random() > 0.3 ? Math.floor(Math.random() * 180) + 30 : 0,
+          level: Math.random() > 0.3 ? Math.floor(Math.random() * 4) + 1 : 0
+        })),
+        consistencyScore: 85
+      };
+    }
+
     const today = new Date();
     // Use local time matching the way today string is generated in focusStore
     const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];

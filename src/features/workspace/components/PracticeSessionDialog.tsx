@@ -47,6 +47,13 @@ export function PracticeSessionDialog({ queue, onClose, onComplete, initialState
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  const resetCardState = () => {
+    setUserInput('');
+    setSelectedOption(null);
+    setIsRevealed(false);
+    setIsCorrect(null);
+  };
+
   useEffect(() => {
     if (!initialState && queue.length > 0) {
       setActiveQueue([...queue]);
@@ -94,12 +101,7 @@ export function PracticeSessionDialog({ queue, onClose, onComplete, initialState
     }
   }, [currentIndex, activeQueue.length, categoryId, sessionStartTime, user]);
 
-  const resetCardState = () => {
-    setUserInput('');
-    setSelectedOption(null);
-    setIsRevealed(false);
-    setIsCorrect(null);
-  };
+
 
   if (activeQueue.length === 0) return null;
 

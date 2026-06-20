@@ -2,10 +2,12 @@ import { TrendingUp, Clock, Flame } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/Card';
 import { useFocusStore } from '../../../store/focusStore';
 import { useCategories } from '../../../hooks/useCategories';
+import { useDemo } from '../../../contexts/DemoContext';
 
 export function QuickStatsCard() {
   const { focusMinutesToday, streak, dailyTargets } = useFocusStore();
   const { categories } = useCategories();
+  const { isDemo } = useDemo();
 
   const formatHours = (minutes: number) => {
     if (minutes < 60) return `${minutes}m`;
@@ -34,12 +36,12 @@ export function QuickStatsCard() {
               <Clock className="h-3 w-3" /> Focus Time
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold">{formatHours(focusMinutesToday)}</span>
+              <span className="text-2xl font-bold">{formatHours(isDemo ? 35 * 60 : focusMinutesToday)}</span>
               {totalTargetMinutes > 0 && (
                 <span className="text-xs text-muted-foreground font-medium">/ {formatHours(totalTargetMinutes)}</span>
               )}
             </div>
-            {totalTargetMinutes > 0 && (
+            {totalTargetMinutes > 0 && !isDemo && (
               <div className="text-xs text-muted-foreground mt-1">
                 Remaining: {formatHours(Math.max(0, totalTargetMinutes - focusMinutesToday))}
               </div>
@@ -49,7 +51,7 @@ export function QuickStatsCard() {
             <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider flex items-center gap-1">
               <Flame className="h-3 w-3 text-orange-500" /> Day Streak
             </span>
-            <span className="text-2xl font-bold">{streak}</span>
+            <span className="text-2xl font-bold">{isDemo ? 7 : streak}</span>
           </div>
         </div>
       </CardContent>

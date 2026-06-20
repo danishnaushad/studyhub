@@ -11,9 +11,12 @@ import { DatePicker } from '../../../components/ui/DatePicker';
 import { getCategoryColor } from '../../../lib/colors';
 import { getLocalYYYYMMDD } from '../../../lib/date';
 import { SprintEducationCard } from '../components/SprintEducationCard';
+import { useDemo } from '../../../contexts/DemoContext';
+
 export function SprintDashboard() {
   const { sprints, loading, error } = useSprints();
   const { categories, loading: catsLoading } = useCategories();
+  const { isDemo } = useDemo();
   
   const todayStr = getLocalYYYYMMDD(new Date());
   const tomorrow = new Date();
@@ -152,7 +155,12 @@ export function SprintDashboard() {
           <h2 className="text-3xl font-bold tracking-tight">Sprint Zone</h2>
           <p className="text-muted-foreground mt-1">Accelerate your progress with focused, time-bound goals.</p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)} className="w-full sm:w-auto shadow-md hover:shadow-lg transition-all">
+        <Button 
+          onClick={() => setIsCreateModalOpen(true)} 
+          className="w-full sm:w-auto shadow-md hover:shadow-lg transition-all"
+          disabled={isDemo}
+          title={isDemo ? "Disabled in Demo Mode" : undefined}
+        >
           <Plus className="mr-2 h-5 w-5" />
           Create Sprint
         </Button>
@@ -167,7 +175,13 @@ export function SprintDashboard() {
           </div>
           <p className="text-2xl font-bold text-foreground mb-2">No Active Sprints</p>
           <p className="mt-1 text-base max-w-lg mb-6">Sprints are short, focused challenges that help you learn faster. Pick a goal, set a deadline, and track your daily progress!</p>
-          <Button onClick={() => setIsCreateModalOpen(true)} size="lg" className="shadow-md">
+          <Button 
+            onClick={() => setIsCreateModalOpen(true)} 
+            size="lg" 
+            className="shadow-md"
+            disabled={isDemo}
+            title={isDemo ? "Disabled in Demo Mode" : undefined}
+          >
             Launch Your First Sprint
           </Button>
         </div>
@@ -400,6 +414,7 @@ export function SprintDashboard() {
 }
 
 function SprintCard({ sprint, category, onUpdateStatus, onDelete, onEdit }: { sprint: Sprint, category?: any, onUpdateStatus: (status: Sprint['status']) => void, onDelete: () => void, onEdit: () => void }) {
+  const { isDemo } = useDemo();
   const isPast = sprint.status === 'completed' || sprint.status === 'failed';
   
   const totalTarget = sprint.targetValue;
@@ -532,26 +547,26 @@ function SprintCard({ sprint, category, onUpdateStatus, onDelete, onEdit }: { sp
 
       <div className="flex justify-end gap-2 mt-4">
         {sprint.status === 'active' && (
-          <Button variant="outline" size="sm" onClick={() => onUpdateStatus('paused')}>
+          <Button variant="outline" size="sm" onClick={() => onUpdateStatus('paused')} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
             <PauseCircle className="h-4 w-4 mr-1" /> Pause
           </Button>
         )}
         {sprint.status === 'paused' && (
-          <Button variant="outline" size="sm" onClick={() => onUpdateStatus('active')}>
+          <Button variant="outline" size="sm" onClick={() => onUpdateStatus('active')} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
             <PlayCircle className="h-4 w-4 mr-1" /> Resume
           </Button>
         )}
         {(sprint.status === 'active' || sprint.status === 'paused') && (
           <>
-            <Button variant="outline" size="sm" onClick={onEdit}>
+            <Button variant="outline" size="sm" onClick={onEdit} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
               <Edit2 className="h-4 w-4 mr-1" /> Edit
             </Button>
-            <Button variant="outline" size="sm" className="text-green-500 hover:text-green-600 hover:bg-green-500/10" onClick={() => onUpdateStatus('completed')}>
+            <Button variant="outline" size="sm" className="text-green-500 hover:text-green-600 hover:bg-green-500/10" onClick={() => onUpdateStatus('completed')} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
               <CheckCircle2 className="h-4 w-4 mr-1" /> Done
             </Button>
           </>
         )}
-        <Button variant="ghost" size="sm" className="text-destructive hover:bg-destructive/10 px-2" onClick={onDelete}>
+        <Button variant="ghost" size="sm" className="text-destructive hover:bg-destructive/10 px-2 disabled:opacity-50" onClick={onDelete} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>

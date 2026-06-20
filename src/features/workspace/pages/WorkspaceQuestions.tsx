@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Plus, Search, HelpCircle, Trophy, Flame, BrainCircuit } from 'lucide-react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useAuth } from '../../../hooks/useAuth';
+import { useDemo } from '../../../contexts/DemoContext';
 import { useQuestions } from '../hooks/useQuestions';
 import { questionsService } from '../services/questions.service';
 import { QuestionCard } from '../components/QuestionCard';
@@ -17,6 +18,7 @@ type FilterType = 'all' | 'learning' | 'review' | 'mastered';
 export function WorkspaceQuestions() {
   const { category } = useWorkspace();
   const { user } = useAuth();
+  const { isDemo } = useDemo();
   const { questions, loading, error } = useQuestions(category.id);
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,8 +36,10 @@ export function WorkspaceQuestions() {
         try {
           const parsed = JSON.parse(saved);
           if (parsed && parsed.activeQueue && parsed.activeQueue.length > 0) {
-            setSavedSessionData(parsed);
-            setShowResumeDialog(true);
+            setTimeout(() => {
+              setSavedSessionData(parsed);
+              setShowResumeDialog(true);
+            }, 0);
           }
         } catch (e) {
           localStorage.removeItem(`studyhub_session_${category.id}`);
@@ -210,7 +214,12 @@ export function WorkspaceQuestions() {
               className="w-full pl-9 pr-4 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          <Button onClick={handleOpenAdd} className="shrink-0 flex items-center gap-2">
+          <Button 
+            onClick={handleOpenAdd} 
+            className="shrink-0 flex items-center gap-2"
+            disabled={isDemo}
+            title={isDemo ? "Disabled in Demo Mode" : undefined}
+          >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Create Card</span>
           </Button>
