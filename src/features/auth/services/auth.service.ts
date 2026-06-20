@@ -2,7 +2,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  updateProfile as updateFirebaseProfile
+  updateProfile as updateFirebaseProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 
 import {
@@ -47,5 +48,9 @@ export const authService = {
   async updateProfile(uid: string, data: Partial<UserProfile>) {
     const userRef = doc(db, 'users', uid);
     await setDoc(userRef, data, { merge: true });
+  },
+
+  async resetPassword(email: string) {
+    await sendPasswordResetEmail(auth, email);
   }
 };

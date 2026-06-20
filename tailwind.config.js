@@ -8,6 +8,11 @@ export default {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
+  safelist: [
+    {
+      pattern: /(bg|text|border|ring)-cat-(blue|green|yellow|purple|red|orange|pink|teal)/,
+    }
+  ],
   theme: {
     extend: {
       colors: {
@@ -27,6 +32,7 @@ export default {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+          text: "hsl(var(--destructive-text))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -44,6 +50,28 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        cat: {
+          blue: "hsl(var(--cat-blue))",
+          green: "hsl(var(--cat-green))",
+          yellow: "hsl(var(--cat-yellow))",
+          purple: "hsl(var(--cat-purple))",
+          red: "hsl(var(--cat-red))",
+          orange: "hsl(var(--cat-orange))",
+          pink: "hsl(var(--cat-pink))",
+          teal: "hsl(var(--cat-teal))",
+        }
       },
       borderRadius: {
         lg: "var(--radius)",

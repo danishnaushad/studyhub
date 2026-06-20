@@ -7,6 +7,15 @@ import { Setup } from '../features/onboarding/pages/Setup';
 import { Dashboard } from '../features/dashboard/pages/Dashboard';
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
+import { WorkspaceLayout } from '../features/workspace/layouts/WorkspaceLayout';
+import { WorkspaceOverview } from '../features/workspace/pages/WorkspaceOverview';
+import { WorkspaceResources } from '../features/workspace/pages/WorkspaceResources';
+import { WorkspaceNotes } from '../features/workspace/pages/WorkspaceNotes';
+import { WorkspaceQuestions } from '../features/workspace/pages/WorkspaceQuestions';
+import { WorkspaceProjects } from '../features/workspace/pages/WorkspaceProjects';
+import { WorkspaceAnalytics } from '../features/workspace/pages/WorkspaceAnalytics';
+import { CategoriesManagement } from '../features/categories/pages/CategoriesManagement';
+import { SprintDashboard } from '../features/sprints/pages/SprintDashboard';
 
 export function AppRoutes() {
   return (
@@ -38,6 +47,49 @@ export function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+
+      {/* Category Management */}
+      <Route 
+        path="/categories" 
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <CategoriesManagement />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Sprint Zone */}
+      <Route 
+        path="/sprints" 
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <SprintDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Category Workspace */}
+      <Route 
+        path="/category/:categoryId" 
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <WorkspaceLayout />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      >
+        <Route path="overview" element={<WorkspaceOverview />} />
+        <Route path="resources" element={<WorkspaceResources />} />
+        <Route path="notes" element={<WorkspaceNotes />} />
+        <Route path="questions" element={<WorkspaceQuestions />} />
+        <Route path="projects" element={<WorkspaceProjects />} />
+        <Route path="analytics" element={<WorkspaceAnalytics />} />
+      </Route>
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

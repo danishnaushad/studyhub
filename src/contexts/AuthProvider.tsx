@@ -26,7 +26,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           doc(db, 'users', firebaseUser.uid),
           (userDoc) => {
             if (userDoc.exists()) {
-              setUser({ uid: firebaseUser.uid, ...userDoc.data() } as UserProfile);
+              const loadedUser = { uid: firebaseUser.uid, ...userDoc.data() } as UserProfile;
+              setUser(loadedUser);
+              
+              // Trigger cloud migration if needed
+              if (!loadedUser.hasMigratedToCloud) {
+                import('../services/migration.service').then(({ migrationService }) => {
+                  migrationService.migrateToCloud(firebaseUser.uid);
+                });
+              }
             } else {
               // Fallback right after registration before the Firestore doc is created
               setUser({

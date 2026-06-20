@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAuth } from './useAuth';
+import { categoriesService } from '../features/categories/services/categories.service';
 
 export interface Category {
   id: string;
   userId: string;
   name: string;
   color: string;
+  targetMinutes: number;
+  isArchived?: boolean;
   createdAt: number;
 }
 
@@ -26,9 +29,13 @@ export function useCategories() {
     const q = query(collection(db, 'categories'), where('userId', '==', user.uid));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      console.log("Current UID:", user?.uid);
+      console.log("CURRENT USER UID:", user?.uid);
+
       snapshot.docs.forEach(doc => {
-        console.log("Category:", doc.id, doc.data());
+        console.log({
+          category: doc.data().name,
+          userId: doc.data().userId
+        });
       });
 
       const data = snapshot.docs.map((doc) => doc.data() as Category);
@@ -36,6 +43,9 @@ export function useCategories() {
       data.sort((a, b) => a.createdAt - b.createdAt);
       setCategories(data);
       setLoading(false);
+
+      // Async migration for legacy hex colors
+      categoriesService.migrateCategoryColors(data).catch(console.error);
     }, (error) => {
       console.error('Error fetching categories:', error);
       setLoading(false);

@@ -1,10 +1,14 @@
 import { Layers } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/Card';
 import { useCategories } from '../../../hooks/useCategories';
 import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
+import { getCategoryColor } from '../../../lib/colors';
+
 
 export function CategoriesCard() {
   const { categories, loading } = useCategories();
+  const navigate = useNavigate();
 
   return (
     <Card>
@@ -20,13 +24,14 @@ export function CategoriesCard() {
         ) : categories.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
-              <span 
+              <button 
                 key={cat.id} 
-                className="px-3 py-1 rounded-full text-sm font-medium text-white"
-                style={{ backgroundColor: cat.color }}
+                onClick={() => navigate(`/category/${cat.id}`)}
+                className="px-3 py-1 rounded-full text-sm font-medium text-white hover:opacity-80 transition-opacity"
+                style={{ backgroundColor: getCategoryColor(cat.color) }}
               >
                 {cat.name}
-              </span>
+              </button>
             ))}
           </div>
         ) : (

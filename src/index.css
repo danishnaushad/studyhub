@@ -1,67 +1,161 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* LIGHT MODE */
+    --background: 210 40% 98%;      /* #F8FAFC */
+    --foreground: 221 39% 11%;      /* #111827 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;              /* #FFFFFF */
+    --card-foreground: 221 39% 11%; /* #111827 */
  
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 221 39% 11%;
  
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;         /* #3B82F6 */
+    --primary-foreground: 0 0% 100%;
  
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 0 0% 100%;         /* #FFFFFF Sidebar approx */
+    --secondary-foreground: 221 39% 11%;
  
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 13% 91%;           /* Light grayish */
+    --muted-foreground: 220 9% 46%; /* #6B7280 */
  
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
  
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-text: 0 74% 42%; /* red-700 */
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --success: 142 71% 45%;         /* #22C55E */
+    --success-foreground: 0 0% 100%;
  
+    --warning: 38 92% 50%;          /* #F59E0B */
+    --warning-foreground: 0 0% 100%;
+ 
+    --info: 199 89% 48%;            /* #0EA5E9 */
+    --info-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;          /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
+ 
+    /* Category Semantic Colors - Light Mode */
+    --cat-blue: 217 91% 60%;
+    --cat-green: 142 71% 45%;
+    --cat-yellow: 38 92% 50%;
+    --cat-purple: 261 83% 58%;
+    --cat-red: 0 84% 60%;
+    --cat-orange: 24 95% 53%;
+    --cat-pink: 330 81% 60%;
+    --cat-teal: 171 77% 44%;
+
     --radius: 0.5rem;
   }
  
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* DARK MODE */
+    --background: 221 39% 11%;      /* #111827 */
+    --foreground: 210 40% 98%;      /* #F8FAFC */
  
-    --card: 222.2 84% 4.9%;
+    --card: 215 28% 17%;            /* #1F2937 */
     --card-foreground: 210 40% 98%;
  
-    --popover: 222.2 84% 4.9%;
+    --popover: 215 28% 17%;
     --popover-foreground: 210 40% 98%;
  
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 213 94% 68%;         /* #60A5FA */
+    --primary-foreground: 221 39% 11%;
  
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 222 47% 11%;       /* #0F172A Sidebar approx */
     --secondary-foreground: 210 40% 98%;
  
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 215 25% 65%;/* #94A3B8 */
  
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 213 94% 68%;
+    --accent-foreground: 221 39% 11%;
  
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
+    --destructive-text: 0 94% 82%; /* red-300 */
  
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --success: 142 71% 45%;
+    --success-foreground: 221 39% 11%;
+ 
+    --warning: 38 92% 50%;
+    --warning-foreground: 221 39% 11%;
+ 
+    --info: 199 89% 48%;
+    --info-foreground: 221 39% 11%;
+
+    --border: 215 25% 27%;          /* #334155 */
+    --input: 215 25% 27%;
+    --ring: 213 94% 68%;
+
+    /* Category Semantic Colors - Dark Mode (Slightly desaturated/lighter for contrast) */
+    --cat-blue: 213 94% 68%;
+    --cat-green: 142 71% 55%;
+    --cat-yellow: 38 92% 60%;
+    --cat-purple: 261 83% 68%;
+    --cat-red: 0 84% 70%;
+    --cat-orange: 24 95% 63%;
+    --cat-pink: 330 81% 70%;
+    --cat-teal: 171 77% 54%;
+  }
+
+  .midnight {
+    /* MIDNIGHT MODE */
+    --background: 229 63% 5%;       /* #050816 */
+    --foreground: 210 40% 98%;      /* #F8FAFC */
+ 
+    --card: 220 49% 8%;             /* #0B1220 */
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 220 49% 8%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 261 83% 58%;         /* #7C3AED */
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 224 71% 4%;        /* #030712 Sidebar approx */
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 220 49% 8%;
+    --muted-foreground: 215 25% 65%;/* #94A3B8 */
+ 
+    --accent: 261 83% 58%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 40% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --destructive-text: 0 96% 89%; /* red-200 */
+ 
+    --success: 142 71% 45%;
+    --success-foreground: 210 40% 98%;
+ 
+    --warning: 38 92% 50%;
+    --warning-foreground: 210 40% 98%;
+ 
+    --info: 199 89% 48%;
+    --info-foreground: 210 40% 98%;
+
+    --border: 217 32% 17%;          /* #1E293B */
+    --input: 217 32% 17%;
+    --ring: 261 83% 58%;
+
+    /* Category Semantic Colors - Midnight Mode (Deep, vibrant jewel tones) */
+    --cat-blue: 221 100% 65%;
+    --cat-green: 145 80% 50%;
+    --cat-yellow: 40 100% 55%;
+    --cat-purple: 270 100% 65%;
+    --cat-red: 0 100% 65%;
+    --cat-orange: 25 100% 60%;
+    --cat-pink: 330 100% 65%;
+    --cat-teal: 175 100% 45%;
   }
 }
  
@@ -70,6 +164,13 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased transition-colors duration-500;
+  }
+  
+  .midnight .bg-card {
+    background-color: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-color: hsl(var(--border) / 0.4);
   }
 }

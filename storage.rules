@@ -1,0 +1,29 @@
+rules_version = '2';
+
+// Craft rules based on data in your Firestore database
+// allow write: if firestore.get(
+//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // All resources stored under users/{userId}/resources/{resourceId}.pdf
+    match /users/{userId}/resources/{fileName} {
+      
+      // Only the owning user can read the file
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Only the owning user can upload/delete
+      // Must be a PDF and under 25MB (25 * 1024 * 1024 = 26214400 bytes)
+      allow write: if request.auth != null 
+                   && request.auth.uid == userId
+                   && (
+                     // Deletions don't check content type/size
+                     request.resource == null || 
+                     (
+                       request.resource.contentType == 'application/pdf'
+                       && request.resource.size < 26214400
+                     )
+                   );
+    }
+  }
+}

@@ -1,45 +1,45 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Play, Pause, Square, Zap } from 'lucide-react';
 import { useFocusStore } from '../../store/focusStore';
+import { useCategories } from '../../hooks/useCategories';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/Button';
 
+import { unlockAudio } from '../../utils/sound';
+import { getCategoryColor } from '../../lib/colors';
+
+
 export const FloatingTimer: React.FC = () => {
+  const { categories } = useCategories();
   const {
     isRunning,
     isPaused,
     activity,
+    categoryId,
     mode,
+    phase,
     remainingTime,
+    elapsedTime,
     startSession,
     pauseSession,
     resumeSession,
     resetSession,
-    tick,
   } = useFocusStore();
 
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (isRunning && !isPaused) {
-      interval = setInterval(() => {
-        tick();
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isRunning, isPaused, tick]);
-
-  const handleStartDemo = () => {
-    startSession('Focus Session', 'pomodoro', 1500);
+  const handleStartDemo = async () => {
+    await unlockAudio();
+    startSession('Focus Session', null, 'pomodoro', 1500, 300);
   };
 
   const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
+    const total = Math.ceil(seconds);
+    const m = Math.floor(total / 60).toString().padStart(2, '0');
+    const s = (total % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   };
 
-  // If completely inactive, render just the demo button as per requirements
-  if (!isRunning && remainingTime === 0) {
+  // If completely inactive, render just the demo button
+  if (!isRunning && remainingTime === 0 && elapsedTime === 0) {
     return (
       <div className="fixed bottom-6 right-6 z-50">
         <Button 
@@ -54,30 +54,55 @@ export const FloatingTimer: React.FC = () => {
     );
   }
 
+  const category = categories.find(c => c.id === categoryId);
+
   // Active or Paused session card (modern glassmorphism)
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 duration-300">
-      <div className="bg-background/60 backdrop-blur-2xl border border-border/40 shadow-2xl rounded-2xl p-5 w-72 flex flex-col gap-4">
+      <div className={cn(
+        "bg-background/60 backdrop-blur-2xl border shadow-2xl rounded-2xl p-5 w-72 flex flex-col gap-4 transition-colors duration-500",
+        phase === 'break' ? "border-orange-500/30" : "border-green-500/30"
+      )}>
         <div className="flex justify-between items-start">
           <div>
-            <h4 className="font-bold text-lg leading-none">{activity}</h4>
-            <p className="text-xs text-muted-foreground uppercase tracking-widest mt-1 font-medium">{mode}</p>
+            <h4 className="font-bold text-lg leading-none truncate max-w-[150px]" title={activity || ''}>{activity}</h4>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium">
+                {mode?.replace('_', ' ')}
+              </p>
+              {category && (
+                 <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ backgroundColor: getCategoryColor(category.color).replace(')', ' / 0.2)'), color: getCategoryColor(category.color) }}>
+                   {category.name}
+                 </span>
+              )}
+            </div>
           </div>
-          <div className={cn(
-            "px-2 py-1 rounded text-xs font-bold tracking-wider",
-            isPaused ? "bg-amber-500/20 text-amber-500" : "bg-primary/20 text-primary"
-          )}>
-            {isPaused ? 'PAUSED' : 'FOCUS'}
+          <div className="flex flex-col items-end gap-1">
+            <div className={cn(
+              "px-2 py-1 rounded text-[10px] font-black tracking-widest uppercase transition-colors duration-500",
+              isPaused ? "bg-amber-500/20 text-amber-500" : 
+              phase === 'break' ? "bg-orange-500/20 text-orange-500" : "bg-green-500/20 text-green-500"
+            )}>
+              {isPaused ? 'PAUSED' : phase === 'break' ? 'BREAK TIME' : 'FOCUS SESSION'}
+            </div>
+            {useFocusStore.getState().totalSessions > 1 && (
+              <span className="text-[10px] font-bold text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
+                Session {useFocusStore.getState().currentSession} / {useFocusStore.getState().totalSessions}
+              </span>
+            )}
           </div>
         </div>
 
-        <div className="text-5xl font-black tracking-tighter text-center tabular-nums text-foreground/90 py-2 drop-shadow-sm">
-          {formatTime(remainingTime)}
+        <div className={cn(
+          "text-5xl font-black tracking-tighter text-center tabular-nums py-2 drop-shadow-sm transition-colors duration-500",
+          phase === 'break' ? "text-orange-500" : "text-green-500"
+        )}>
+          {formatTime(mode === 'stopwatch' ? elapsedTime : remainingTime)}
         </div>
 
         <div className="flex items-center justify-center gap-3 pt-2 border-t border-border/30">
           {isPaused ? (
-            <Button size="icon" variant="default" className="rounded-full h-10 w-10 shadow-md" onClick={resumeSession}>
+            <Button size="icon" variant="default" className="rounded-full h-10 w-10 shadow-md" onClick={async () => { await unlockAudio(); resumeSession(); }}>
               <Play className="h-4 w-4 ml-0.5" />
             </Button>
           ) : (

@@ -8,16 +8,18 @@ import {
   HelpCircle, 
   BarChart3, 
   Settings,
-  LogOut
+  LogOut,
+  Target
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { authService } from '../../features/auth/services/auth.service';
 
 const navigation = [
   { name: 'Mission Control', href: '/', icon: LayoutDashboard, disabled: false },
+  { name: 'Sprint Zone', href: '/sprints', icon: Target, disabled: false },
   { name: 'Learning Hub', href: '/learning', icon: BookOpen, disabled: true },
   { name: 'Focus Sessions', href: '/focus', icon: Focus, disabled: true },
-  { name: 'Categories', href: '/categories', icon: Layers, disabled: true },
+  { name: 'Categories', href: '/categories', icon: Layers, disabled: false },
   { name: 'Questions Vault', href: '/vault', icon: HelpCircle, disabled: true },
   { name: 'Analytics', href: '/analytics', icon: BarChart3, disabled: true },
 ];
