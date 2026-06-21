@@ -37,8 +37,12 @@ const MidnightCardSurface = () => {
   );
 };
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  disableSurface?: boolean;
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, disableSurface, ...props }, ref) => {
     const { theme } = useTheme();
     const isMidnight = theme === 'midnight';
     
@@ -52,7 +56,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
         )} 
         {...props} 
       >
-        {isMidnight && <MidnightCardSurface />}
+        {isMidnight && !disableSurface && <MidnightCardSurface />}
         <div className="relative z-10 h-full flex flex-col">
           {props.children}
         </div>

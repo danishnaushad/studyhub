@@ -6,9 +6,10 @@ import { getMasteryLevel } from '../utils/vaultHelpers';
 interface CategoryMasteryGridProps {
   questions: Question[];
   categories: { id: string; name: string; color: string }[];
+  disableSurface?: boolean;
 }
 
-export function CategoryMasteryGrid({ questions, categories }: CategoryMasteryGridProps) {
+export function CategoryMasteryGrid({ questions, categories, disableSurface }: CategoryMasteryGridProps) {
   const categoryStats = categories.map(cat => {
     const catQuestions = questions.filter(q => q.categoryId === cat.id);
     const total = catQuestions.length;
@@ -27,7 +28,7 @@ export function CategoryMasteryGrid({ questions, categories }: CategoryMasteryGr
   }
 
   return (
-    <Card>
+    <Card disableSurface={disableSurface} className="shadow-sm border-border/50">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
           Mastery by Category
