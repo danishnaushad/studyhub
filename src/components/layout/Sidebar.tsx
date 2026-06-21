@@ -9,7 +9,8 @@ import {
   BarChart3, 
   Settings,
   LogOut,
-  Target
+  Target,
+  Map
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { authService } from '../../features/auth/services/auth.service';
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Focus Sessions', href: '/focus', icon: Focus, disabled: true },
   { name: 'Categories', href: '/categories', icon: Layers, disabled: false },
   { name: 'Questions Vault', href: '/vault', icon: HelpCircle, disabled: false },
+  { name: 'Study OS Roadmap', href: '/roadmap', icon: Map, disabled: false },
   { name: 'Analytics', href: '/analytics', icon: BarChart3, disabled: true },
 ];
 

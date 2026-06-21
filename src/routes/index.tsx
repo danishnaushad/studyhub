@@ -20,6 +20,7 @@ import { VaultLayout } from '../features/vault/layouts/VaultLayout';
 import { VaultDashboard } from '../features/vault/pages/VaultDashboard';
 import { VaultCards } from '../features/vault/pages/VaultCards';
 import { VaultAnalytics } from '../features/vault/pages/VaultAnalytics';
+import { RoadmapDashboard } from '../features/roadmap/pages/RoadmapDashboard';
 export function AppRoutes() {
   return (
     <Routes>
@@ -92,6 +93,18 @@ export function AppRoutes() {
         <Route path="cards" element={<VaultCards />} />
         <Route path="analytics" element={<VaultAnalytics />} />
       </Route>
+
+      {/* Roadmap */}
+      <Route
+        path="/roadmap"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <RoadmapDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Category Workspace */}
       <Route 
