@@ -188,7 +188,7 @@ export function LiveClockCard() {
         <Settings className="w-4 h-4 transition-transform hover:rotate-90 duration-500" />
       </button>
 
-      <div className="flex flex-col items-center justify-center gap-10 w-full z-0 relative">
+      <div className="flex flex-col items-center justify-center gap-6 w-full z-0 relative">
         {(settings.displayMode === 'analog' || settings.displayMode === 'both') && (
           <div 
             className={`relative w-48 h-48 md:w-56 md:h-56 rounded-full shrink-0 transition-all duration-500 ${t.container}`} 
@@ -241,22 +241,37 @@ export function LiveClockCard() {
 
         {(settings.displayMode === 'digital' || settings.displayMode === 'both') && (
           <div className={`flex flex-col items-center text-center ${getDigitalThemeClasses()}`}>
-            <div className={`${settings.digitalTheme === 'focus' ? 'text-7xl md:text-[110px]' : sizeClasses[settings.fontSize]} flex items-baseline`} style={{ color: settings.digitalTheme === 'dashboard' ? settings.accentColor : undefined }}>
-              {displayHours}:{minutes.toString().padStart(2, '0')}
+            <div className={`${settings.digitalTheme === 'focus' ? 'text-6xl md:text-7xl' : sizeClasses[settings.fontSize]} flex items-end font-black tracking-tighter`} style={{ color: settings.digitalTheme === 'dashboard' ? settings.accentColor : undefined, lineHeight: 0.85 }}>
+              <span>{displayHours}:{minutes.toString().padStart(2, '0')}</span>
               {settings.showSeconds && (
-                <span className="text-xl md:text-2xl opacity-50 font-semibold tracking-normal ml-1.5">
-                  {seconds.toString().padStart(2, '0')}
+                <span className="text-2xl md:text-3xl opacity-60 font-bold ml-1 mb-[2px] md:mb-[4px]">
+                  :{seconds.toString().padStart(2, '0')}
                 </span>
               )}
-              {ampm && <span className="text-sm font-bold ml-2 opacity-40">{ampm}</span>}
+              {ampm && <span className="text-sm font-bold ml-2 opacity-40 mb-[4px]">{ampm}</span>}
             </div>
             
-            {(settings.showDate || settings.showDayOfWeek) && (
-              <div className="text-[11px] md:text-xs uppercase tracking-[0.2em] opacity-40 font-semibold mt-3 flex gap-2">
-                {settings.showDayOfWeek && <span>{targetTime.toLocaleDateString(undefined, { weekday: 'long' })}</span>}
-                {settings.showDate && settings.showDayOfWeek && <span>•</span>}
-                {settings.showDate && <span>{targetTime.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>}
+            {(settings.showDate || settings.showDayOfWeek) && !isRunning && (
+              <div className="flex flex-col items-center gap-1 mt-4">
+                {settings.showDayOfWeek && (
+                  <span className="text-[11px] md:text-xs uppercase tracking-[0.2em] opacity-60 font-bold">
+                    {targetTime.toLocaleDateString(undefined, { weekday: 'long' })}
+                  </span>
+                )}
+                {settings.showDate && (
+                  <span className="text-[11px] md:text-xs uppercase tracking-[0.2em] opacity-60 font-bold">
+                    {targetTime.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </span>
+                )}
               </div>
+            )}
+
+            {isRunning && (
+               <div className="text-[11px] md:text-xs uppercase tracking-widest font-bold mt-4 flex gap-2 text-primary animate-pulse shadow-sm">
+                 <span className="px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
+                   Session Active
+                 </span>
+               </div>
             )}
           </div>
         )}

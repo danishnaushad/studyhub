@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, Square, Zap } from 'lucide-react';
+import { Play, Pause, Square } from 'lucide-react';
 import { useFocusStore } from '../../store/focusStore';
 import { useCategories } from '../../hooks/useCategories';
 import { cn } from '../../lib/utils';
@@ -20,16 +20,12 @@ export const FloatingTimer: React.FC = () => {
     phase,
     remainingTime,
     elapsedTime,
-    startSession,
     pauseSession,
     resumeSession,
     resetSession,
   } = useFocusStore();
 
-  const handleStartDemo = async () => {
-    await unlockAudio();
-    startSession('Focus Session', null, 'pomodoro', 1500, 300);
-  };
+
 
   const formatTime = (seconds: number) => {
     const total = Math.ceil(seconds);
@@ -38,20 +34,9 @@ export const FloatingTimer: React.FC = () => {
     return `${m}:${s}`;
   };
 
-  // If completely inactive, render just the demo button
+  // If completely inactive, render nothing
   if (!isRunning && remainingTime === 0 && elapsedTime === 0) {
-    return (
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button 
-          onClick={handleStartDemo}
-          className="shadow-xl rounded-full px-6 py-6 bg-background/80 backdrop-blur-md border border-primary/20 hover:bg-primary/10 text-foreground transition-all duration-300 flex items-center gap-2"
-          variant="outline"
-        >
-          <Zap className="h-5 w-5 text-primary" />
-          <span className="font-semibold">Start Demo Session</span>
-        </Button>
-      </div>
-    );
+    return null;
   }
 
   const category = categories.find(c => c.id === categoryId);

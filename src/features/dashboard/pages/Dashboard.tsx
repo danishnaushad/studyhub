@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { cn } from '../../../lib/utils';
 import { QuestionsAnalyticsWidget } from '../components/QuestionsAnalyticsWidget';
 import { UserProfileSection } from '../components/UserProfileSection';
 import { ActiveSprintCard } from '../components/ActiveSprintCard';
@@ -43,33 +44,47 @@ export function Dashboard() {
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Top Header / Goal */}
-        {widgetVisibility.currentSprint && (
-          <div className="md:col-span-2 lg:col-span-3">
+        {widgetVisibility.currentSprint && !isRunning && (
+          <div className="md:col-span-2 lg:col-span-3 mb-2">
             <ActiveSprintCard />
           </div>
         )}
 
-        {/* 1. Focus Engine + Mission */}
-        <div className={`lg:col-span-2 flex flex-col gap-6 ${focusGroupClass}`}>
-          <FocusSessionCard />
-          {widgetVisibility.dailyGoal && <TodaysMissionCard />}
+        {/* 1. Primary Zone: Focus Engine */}
+        <div className={cn(
+          "flex flex-col gap-6 transition-all duration-700",
+          isRunning ? "md:col-span-2 lg:col-span-3" : "lg:col-span-2",
+          focusGroupClass
+        )}>
+          <div className={cn("transition-all duration-700", isRunning ? "min-h-[600px] flex flex-col" : "")}>
+            <FocusSessionCard />
+          </div>
+          {widgetVisibility.dailyGoal && !isRunning && <TodaysMissionCard />}
         </div>
         
-        {/* Top Right Column: Clock > Music > Calendar > Deadlines */}
-        <div className="lg:col-span-1 flex flex-col gap-6">
-          {widgetVisibility.clock && (
+        {/* 2. Secondary Zone: Clock > Music > Calendar > Deadlines */}
+        <div className={cn(
+          "transition-all duration-700",
+          isRunning ? "md:col-span-2 lg:col-span-3" : "lg:col-span-1 flex flex-col gap-6"
+        )}>
+          <div className={cn(
+            "grid gap-6 w-full transition-all duration-700",
+            isRunning ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4" : "grid-cols-1"
+          )}>
+            {widgetVisibility.clock && (
+              <div className={focusGroupClass}>
+                <LiveClockCard />
+              </div>
+            )}
             <div className={focusGroupClass}>
-              <LiveClockCard />
+              <FocusMusicCard />
             </div>
-          )}
-          <div className={focusGroupClass}>
-            <FocusMusicCard />
-          </div>
-          <div className={dimGroupClass}>
-            <CalendarWidget />
-          </div>
-          <div className={dimGroupClass}>
-            <DeadlineWidget />
+            <div className={dimGroupClass}>
+              <CalendarWidget />
+            </div>
+            <div className={dimGroupClass}>
+              <DeadlineWidget />
+            </div>
           </div>
         </div>
 

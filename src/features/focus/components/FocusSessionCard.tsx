@@ -7,7 +7,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useCategories } from '../../../hooks/useCategories';
 import { useFocusStore } from '../../../store/focusStore';
 import type { FocusMode } from '../../../store/focusStore';
-import { Timer, Play, Pause, Square, Activity, Target, TrendingUp, Settings } from 'lucide-react';
+import { Timer, Play, Pause, Square, Activity, Settings } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { useTheme } from '../../../contexts/ThemeProvider';
 
@@ -21,8 +21,9 @@ export function FocusSessionCard() {
   const { categories } = useCategories();
   const { 
     isRunning, isPaused, activity, categoryId, mode, remainingTime, elapsedTime, phase,
-    currentSession, totalSessions, focusMinutesToday, categoryProgress, focusTheme,
+    currentSession, totalSessions, focusTheme,
     focusBackground, ambientSoundscape, sessionLayout, quoteCategory, widgetVisibility,
+    focusDuration, breakDuration,
     startSession, pauseSession, resumeSession, resetSession, setTheme,
     setBackground, setSoundscape, setLayout, setQuoteCategory, setWidgetVisibility
   } = useFocusStore();
@@ -77,8 +78,11 @@ export function FocusSessionCard() {
 
   const isCompleted = phase === 'completed';
   const activeCategory = categories.find(c => c.id === categoryId);
-  const activeCategoryProgress = categoryId ? Math.floor((categoryProgress[categoryId] || 0) / 60) : 0;
-  const activeCategoryTarget = activeCategory?.targetMinutes || 0;
+
+  const currentDuration = phase === 'focus' ? focusDuration : breakDuration;
+  const progressPercent = mode === 'stopwatch' || currentDuration === 0 
+    ? 100 
+    : Math.max(0, Math.min(100, ((currentDuration - remainingTime) / currentDuration) * 100));
 
   const getThemeStyles = () => {
     switch (focusTheme) {
@@ -145,222 +149,230 @@ export function FocusSessionCard() {
           
           <CardContent className="pt-6 space-y-6 flex-1 flex flex-col">
         {(!isRunning || isCompleted) ? (
-          <div className="space-y-4 animate-in fade-in flex-1">
+          <div className="space-y-6 animate-in fade-in flex-1 flex flex-col">
             {isCompleted && (
-              <div className="bg-primary/10 text-primary p-4 rounded-lg text-center font-bold text-lg animate-bounce shadow-sm border border-primary/20">
+              <div className="bg-primary/10 text-primary p-4 rounded-xl text-center font-bold text-lg animate-bounce shadow-sm border border-primary/20">
                 Session Complete 🎉
               </div>
             )}
             
-            <div className="space-y-2">
-              <Label>Activity</Label>
-              <Input 
-                value={inputActivity} 
-                onChange={(e) => setInputActivity(e.target.value)} 
-                placeholder="What are you focusing on?"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Mode</Label>
-                <select 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  value={selectedMode}
-                  onChange={handleModeChange}
-                >
-                  <option value="pomodoro">Pomodoro</option>
-                  <option value="animedoro">Animedoro</option>
-                  <option value="deep_work">Deep Work</option>
-                  <option value="countdown">Countdown</option>
-                  <option value="stopwatch">Stopwatch</option>
-                  <option value="custom">Custom</option>
-                </select>
-                {selectedMode === 'pomodoro' && <p className="text-[10px] text-muted-foreground mt-1">25m focus, 5m break. Ideal for deep learning.</p>}
-                {selectedMode === 'animedoro' && <p className="text-[10px] text-muted-foreground mt-1">45m focus, 15m break. Great for watching an episode after studying.</p>}
-                {selectedMode === 'deep_work' && <p className="text-[10px] text-muted-foreground mt-1">60m+ pure focus. No breaks. Flow state.</p>}
-                {selectedMode === 'countdown' && <p className="text-[10px] text-muted-foreground mt-1">Short sprints to get started.</p>}
-                {selectedMode === 'stopwatch' && <p className="text-[10px] text-muted-foreground mt-1">Count up indefinitely. Log when done.</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Category</Label>
-                <select 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                  <option value="">No Category</option>
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Focus Duration (min)</Label>
-                <Input 
-                  type="number" 
-                  min="0.01"
-                  step="0.01" 
-                  value={focusInput} 
-                  onChange={(e) => setFocusInput(parseFloat(e.target.value) || 0)}
-                  disabled={selectedMode === 'stopwatch'}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Break Duration (min)</Label>
-                <Input 
-                  type="number" 
-                  min="0.01"
-                  step="0.01" 
-                  value={breakInput} 
-                  onChange={(e) => setBreakInput(parseFloat(e.target.value) || 0)}
-                  disabled={selectedMode === 'stopwatch'}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Sessions</Label>
-              {!isCustomSession ? (
-                <select 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  value={sessionsInput}
-                  onChange={(e) => {
-                    if (e.target.value === 'custom') {
-                      setIsCustomSession(true);
-                      setSessionsInput(10);
-                    } else {
-                      setSessionsInput(parseInt(e.target.value) || 1);
-                    }
-                  }}
-                  disabled={selectedMode === 'stopwatch' || selectedMode === 'countdown'}
-                >
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                    <option key={num} value={num}>{num}</option>
-                  ))}
-                  <option value="custom">Custom...</option>
-                </select>
-              ) : (
-                <div className="flex gap-2">
-                  <Input 
-                    type="number" 
-                    min="1" 
-                    value={sessionsInput} 
-                    onChange={(e) => setSessionsInput(parseInt(e.target.value) || 1)}
-                    autoFocus
-                    disabled={selectedMode === 'stopwatch' || selectedMode === 'countdown'}
-                  />
-                  <Button variant="outline" onClick={() => {
-                    setIsCustomSession(false);
-                    setSessionsInput(1);
-                  }}>Back</Button>
+            <div className="space-y-6 flex-1">
+              {/* Section 1: Session Setup */}
+              <div className="space-y-4">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground border-b pb-2">1. Session Setup</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground font-semibold">Activity Name</Label>
+                    <Input 
+                      value={inputActivity} 
+                      onChange={(e) => setInputActivity(e.target.value)} 
+                      placeholder="What are you focusing on?"
+                      className="h-11 border-muted-foreground/20 focus-visible:ring-primary/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground font-semibold">Category</Label>
+                    <select 
+                      className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 border-muted-foreground/20 focus:border-primary/50 transition-colors"
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                      <option value="">No Category</option>
+                      {categories.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              )}
+              </div>
+
+              {/* Section 2: Configuration */}
+              <div className="space-y-4 pt-2">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground border-b pb-2">2. Configuration</h3>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground font-semibold">Mode</Label>
+                    <select 
+                      className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 border-muted-foreground/20"
+                      value={selectedMode}
+                      onChange={handleModeChange}
+                    >
+                      <option value="pomodoro">Pomodoro</option>
+                      <option value="animedoro">Animedoro</option>
+                      <option value="deep_work">Deep Work</option>
+                      <option value="countdown">Countdown</option>
+                      <option value="stopwatch">Stopwatch</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground font-semibold">Focus (min)</Label>
+                    <Input 
+                      type="number" min="0.01" step="0.01" 
+                      value={focusInput} 
+                      onChange={(e) => setFocusInput(parseFloat(e.target.value) || 0)}
+                      disabled={selectedMode === 'stopwatch'}
+                      className="h-11 border-muted-foreground/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground font-semibold">Break (min)</Label>
+                    <Input 
+                      type="number" min="0" step="0.01" 
+                      value={breakInput} 
+                      onChange={(e) => setBreakInput(parseFloat(e.target.value) || 0)}
+                      disabled={selectedMode === 'stopwatch'}
+                      className="h-11 border-muted-foreground/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground font-semibold">Sessions</Label>
+                    {!isCustomSession ? (
+                      <select 
+                        className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 border-muted-foreground/20"
+                        value={sessionsInput}
+                        onChange={(e) => {
+                          if (e.target.value === 'custom') {
+                            setIsCustomSession(true);
+                            setSessionsInput(10);
+                          } else {
+                            setSessionsInput(parseInt(e.target.value) || 1);
+                          }
+                        }}
+                        disabled={selectedMode === 'stopwatch' || selectedMode === 'countdown'}
+                      >
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map(num => <option key={num} value={num}>{num}</option>)}
+                        <option value="custom">Custom...</option>
+                      </select>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Input 
+                          type="number" min="1" 
+                          value={sessionsInput} 
+                          onChange={(e) => setSessionsInput(parseInt(e.target.value) || 1)}
+                          autoFocus
+                          disabled={selectedMode === 'stopwatch' || selectedMode === 'countdown'}
+                          className="h-11"
+                        />
+                        <Button variant="outline" className="h-11" onClick={() => { setIsCustomSession(false); setSessionsInput(1); }}>Back</Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Minimal description of mode */}
+                <div className="text-[11px] text-muted-foreground">
+                  {selectedMode === 'pomodoro' && '25m focus, 5m break. Ideal for deep learning.'}
+                  {selectedMode === 'animedoro' && '45m focus, 15m break. Great for watching an episode after studying.'}
+                  {selectedMode === 'deep_work' && '60m+ pure focus. No breaks. Flow state.'}
+                  {selectedMode === 'countdown' && 'Short sprints to get started.'}
+                  {selectedMode === 'stopwatch' && 'Count up indefinitely. Log when done.'}
+                </div>
+              </div>
             </div>
 
+            {/* Smart Session Summary & Action */}
+            <div className="mt-auto pt-6 flex flex-col gap-5 border-t border-muted/50">
+               <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 flex flex-col items-center justify-center text-center">
+                 <div className="text-[10px] uppercase tracking-widest text-primary font-bold mb-1.5 opacity-80">Session Summary</div>
+                 <div className="text-sm font-medium text-foreground/90">
+                   <span className="font-bold text-foreground">{inputActivity || 'Deep Work'}</span> • {selectedMode.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())} • {sessionsInput} Session{sessionsInput > 1 ? 's' : ''}
+                 </div>
+                 {selectedMode !== 'stopwatch' && (
+                   <div className="text-xs text-muted-foreground font-medium mt-1">
+                      {focusInput}m Focus {breakInput > 0 ? `• ${breakInput}m Break` : ''} • Est. Time: {Math.round((focusInput + breakInput) * sessionsInput)}m
+                   </div>
+                 )}
+               </div>
 
-            <Button onClick={handleStart} className="w-full mt-4">
-              <Play className="w-4 h-4 mr-2" /> Start Focus Session
-            </Button>
-            {formError && <p className="text-sm font-semibold text-red-500 text-center animate-in slide-in-from-top-1">{formError}</p>}
+              <Button onClick={handleStart} size="lg" className="w-full h-16 text-lg font-black rounded-xl shadow-[0_0_40px_rgba(139,92,246,0.3)] hover:shadow-[0_0_60px_rgba(139,92,246,0.5)] hover:scale-[1.02] transition-all bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient text-primary-foreground border border-white/20 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                <div className="relative flex items-center justify-center">
+                  <Play className="w-6 h-6 mr-3 fill-current" /> START FOCUS SESSION
+                </div>
+              </Button>
+              {formError && <p className="text-sm font-semibold text-red-500 text-center animate-in slide-in-from-top-1">{formError}</p>}
+            </div>
           </div>
         ) : (
-          <div className="flex flex-col h-full animate-in zoom-in-95 duration-300">
-            <div className="flex-1 flex flex-col items-center justify-center py-6">
-              <div className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                 <span className="font-bold text-foreground">Current Focus:</span> {activity}
-                 {activeCategory && (
-                   <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: getCategoryColor(activeCategory.color).replace(')', ' / 0.2)'), color: getCategoryColor(activeCategory.color) }}>
-                     {activeCategory.name}
-                   </span>
-                  )}
-              </div>
+          <div className="flex flex-col h-full animate-in zoom-in-95 duration-500 justify-center">
+            <div className="flex-1 flex flex-col items-center justify-center py-8 md:py-12 space-y-10 relative">
               
-              <div className={cn(
-                "w-full max-w-sm rounded-3xl border transition-all duration-700 p-8 flex flex-col items-center justify-center my-4",
-                themeStyles.wrapper
-              )}>
+              {/* Top Meta */}
+              <div className="flex flex-col items-center gap-4 text-center">
                 <div className={cn(
-                  "px-3 py-1 mb-6 rounded-full text-[10px] font-black tracking-widest uppercase border shadow-sm transition-colors duration-500",
+                  "px-4 py-1.5 rounded-full text-[11px] font-black tracking-[0.2em] uppercase border shadow-sm transition-colors duration-500",
                   themeStyles.badge
                 )}>
                   {phase === 'break' ? 'BREAK TIME' : 'FOCUS SESSION'}
                 </div>
-
+                
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-none text-foreground">
+                  {activity}
+                </h2>
+                
+                {activeCategory && (
+                  <span className="px-3 py-1 rounded-full text-sm font-semibold mt-2 shadow-sm border border-white/10" style={{ backgroundColor: getCategoryColor(activeCategory.color).replace(')', ' / 0.15)'), color: getCategoryColor(activeCategory.color) }}>
+                    {activeCategory.name}
+                  </span>
+                )}
+              </div>
+              
+              {/* Massive Timer */}
+              <div className="relative flex justify-center items-center w-full my-6">
                 <div 
                   className={cn(
-                    "text-7xl tabular-nums transition-all duration-1000",
+                    "text-[7rem] md:text-[9rem] lg:text-[11rem] tabular-nums transition-all duration-1000 leading-none",
                     themeStyles.timer
                   )}
                   style={
                     theme === 'midnight' 
-                      ? { filter: `drop-shadow(0 0 ${isRunning ? '45px' : '30px'} rgba(124,58,237,${isRunning ? '0.25' : '0.15'}))` } 
-                      : focusTheme === 'terminal' ? { filter: 'drop-shadow(0 0 10px rgba(34,197,94,0.4))' } : { filter: 'drop-shadow(0 4px 3px rgb(0 0 0 / 0.07))' }
+                      ? { filter: `drop-shadow(0 0 ${isRunning ? '60px' : '30px'} rgba(124,58,237,${isRunning ? '0.3' : '0.15'}))` } 
+                      : focusTheme === 'terminal' ? { filter: 'drop-shadow(0 0 15px rgba(34,197,94,0.4))' } : { filter: 'drop-shadow(0 8px 10px rgb(0 0 0 / 0.1))' }
                   }
                 >
                   {formatTime(mode === 'stopwatch' ? elapsedTime : remainingTime)}
                 </div>
               </div>
               
-              <div className="text-sm uppercase tracking-widest text-muted-foreground mt-2 font-semibold flex items-center gap-2">
-                <Activity className="h-4 w-4" />
-                {mode?.replace('_', ' ')} {totalSessions > 1 && `• Session ${currentSession} / ${totalSessions}`}
-              </div>
-              
-              <div className="flex gap-4 mt-8 w-full justify-center">
-                {isPaused ? (
-                  <Button onClick={async () => { await unlockAudio(); resumeSession(); }} size="lg" className="w-32 rounded-full shadow-md">
-                    <Play className="w-4 h-4 mr-2" /> Resume
-                  </Button>
-                ) : (
-                  <Button onClick={pauseSession} variant="outline" size="lg" className="w-32 rounded-full shadow-sm bg-secondary/50">
-                    <Pause className="w-4 h-4 mr-2" /> Pause
-                  </Button>
-                )}
-                <Button onClick={resetSession} variant="outline" size="lg" className="w-32 rounded-full shadow-sm text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600 hover:border-red-300">
-                  <Square className="w-4 h-4 mr-2" /> Stop
-                </Button>
-              </div>
-            </div>
+              {/* Progress & Controls */}
+              <div className="w-full max-w-md mx-auto space-y-8">
+                <div className="flex items-center justify-between text-sm uppercase tracking-widest text-muted-foreground font-bold px-2">
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4" />
+                    {mode?.replace('_', ' ')}
+                  </div>
+                  <div>
+                    {totalSessions > 1 && `Session ${currentSession} / ${totalSessions}`}
+                  </div>
+                </div>
 
-            {/* Current Session Progress Details */}
-            <div className="grid grid-cols-2 gap-4 border-t pt-4 mt-auto">
-              {activeCategory ? (
-                <div className="bg-muted/30 p-3 rounded-lg border">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase mb-1">
-                    <Target className="h-3.5 w-3.5" /> Category Progress
-                  </div>
-                  <div className="text-lg font-bold">
-                    {activeCategoryProgress}m <span className="text-muted-foreground text-sm font-normal">/ {activeCategoryTarget}m</span>
-                  </div>
-                  <div className="w-full bg-secondary h-1.5 rounded-full mt-2 overflow-hidden">
+                {mode !== 'stopwatch' && (
+                  <div className="w-full h-2 rounded-full bg-muted overflow-hidden relative shadow-inner">
                     <div 
-                      className="h-full transition-all duration-1000" 
-                      style={{ 
-                        width: `${Math.min(100, activeCategoryTarget > 0 ? (activeCategoryProgress / activeCategoryTarget) * 100 : 0)}%`,
-                        backgroundColor: getCategoryColor(activeCategory.color)
-                      }} 
-                    />
+                      className={cn("h-full transition-all duration-1000 relative", phase === 'break' ? 'bg-orange-500' : 'bg-green-500')} 
+                      style={{ width: `${progressPercent}%` }} 
+                    >
+                      <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]" />
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="bg-muted/30 p-3 rounded-lg border flex items-center justify-center text-sm text-muted-foreground">
-                  No category selected
-                </div>
-              )}
+                )}
 
-              <div className="bg-muted/30 p-3 rounded-lg border">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase mb-1">
-                  <TrendingUp className="h-3.5 w-3.5" /> Today's Total
-                </div>
-                <div className="text-lg font-bold text-primary">
-                  {Math.floor(focusMinutesToday / 60)}h {focusMinutesToday % 60}m
+                <div className="flex gap-4 w-full justify-center">
+                  {isPaused ? (
+                    <Button onClick={async () => { await unlockAudio(); resumeSession(); }} size="lg" className="h-14 w-40 rounded-2xl shadow-md text-base font-bold">
+                      <Play className="w-5 h-5 mr-2" /> Resume
+                    </Button>
+                  ) : (
+                    <Button onClick={pauseSession} variant="outline" size="lg" className="h-14 w-40 rounded-2xl shadow-sm bg-secondary/50 text-base font-bold border-muted-foreground/20 hover:bg-secondary">
+                      <Pause className="w-5 h-5 mr-2" /> Pause
+                    </Button>
+                  )}
+                  <Button onClick={resetSession} variant="outline" size="lg" className="h-14 w-40 rounded-2xl shadow-sm text-red-500 border-red-200/50 hover:bg-red-500/10 hover:text-red-600 hover:border-red-500/30 text-base font-bold">
+                    <Square className="w-5 h-5 mr-2" /> Stop
+                  </Button>
                 </div>
               </div>
+
             </div>
           </div>
         )}

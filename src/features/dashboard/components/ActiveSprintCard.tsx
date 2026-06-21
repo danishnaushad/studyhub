@@ -22,20 +22,20 @@ export function ActiveSprintCard() {
 
   if (!activeSprint) {
     return (
-      <div className="p-6 bg-card border rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Target className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold tracking-tight">No Active Sprints</h3>
-            <p className="text-muted-foreground text-sm mt-1">Set a goal and sprint towards it to accelerate your learning.</p>
-          </div>
+      <div className="p-8 bg-card border border-dashed border-primary/30 rounded-xl shadow-sm flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group">
+        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+        <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+          <Target className="h-8 w-8 text-primary" />
         </div>
-        <Button onClick={() => navigate('/sprints')} className="relative z-10 shrink-0 shadow-md transition-transform hover:scale-105">
-          <Zap className="mr-2 h-4 w-4" />
-          Create Sprint
+        <div>
+          <h3 className="text-2xl font-bold tracking-tight">Accelerate Your Learning</h3>
+          <p className="text-muted-foreground text-sm max-w-[400px] mt-2 mx-auto">
+            Sprints help you break down massive goals into focused, high-intensity learning blocks. Set a target, commit to a deadline, and track your daily required effort.
+          </p>
+        </div>
+        <Button onClick={() => navigate('/sprints')} size="lg" className="mt-4 shadow-lg transition-transform hover:scale-105 bg-primary text-primary-foreground">
+          <Zap className="mr-2 h-5 w-5" />
+          Create Your First Sprint
         </Button>
       </div>
     );
