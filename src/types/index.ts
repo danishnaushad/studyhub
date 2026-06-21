@@ -126,3 +126,43 @@ export interface Sprint {
   progressMap?: Record<string, number>;
   createdAt: number;
 }
+
+export interface StudySession {
+  id: string;
+  userId: string;
+  cardsReviewed: number;
+  correctCount: number;
+  hardCount: number;
+  incorrectCount: number;
+  accuracy: number;
+  duration: number; // in seconds
+  masteryGained: number;
+  completedAt: number;
+}
+
+export interface PdfDocument {
+  id: string;
+  userId: string;
+  categoryId: string;
+  title: string;
+  fileUrl: string;
+  fileSize: number;
+  pageCount: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface PdfHighlight {
+  id: string;
+  userId: string;
+  pdfId: string;
+  pdfTitle: string;
+  pageNumber: number;
+  highlightText: string;
+  color: 'yellow' | 'blue' | 'green' | 'pink';
+  createdAt: number;
+  updatedAt: number;
+}
+
+
+

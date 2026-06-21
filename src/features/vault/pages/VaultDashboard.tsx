@@ -7,8 +7,11 @@ import { MasteryLevelBadge } from '../components/MasteryLevelBadge';
 import { useVault } from '../hooks/useVault';
 import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
 
+import { useNavigate } from 'react-router-dom';
+
 export function VaultDashboard() {
   const { stats, categoryStats, loading, categories } = useVault();
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -64,7 +67,7 @@ export function VaultDashboard() {
                   <span className="text-green-500 font-semibold">All caught up!</span>
                 )}
               </p>
-              <Button size="lg" className="text-lg tracking-wide font-bold shadow-md hover:scale-[1.02] transition-transform gap-2">
+              <Button onClick={() => navigate('/vault/review')} size="lg" className="text-lg tracking-wide font-bold shadow-md hover:scale-[1.02] transition-transform gap-2">
                 <Zap className="h-5 w-5" />
                 Study Now {stats.dueToday > 0 && `(${stats.dueToday})`}
               </Button>

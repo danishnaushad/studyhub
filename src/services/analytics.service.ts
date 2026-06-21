@@ -19,6 +19,21 @@ export const analyticsService = {
     }
   },
 
+  saveStudySession: async (session: Omit<import('../types').StudySession, 'userId'>) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const sessionRef = doc(db, 'study_sessions', session.id);
+      await setDoc(sessionRef, {
+        ...session,
+        userId: user.uid
+      });
+    } catch (error) {
+      console.error('Failed to sync study session to cloud:', error);
+    }
+  },
+
   updateStreakTransaction: async (userId: string, todayStr: string, yesterdayStr: string) => {
     try {
       const userRef = doc(db, 'users', userId);

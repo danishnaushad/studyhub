@@ -21,12 +21,14 @@ import { VaultDashboard } from '../features/vault/pages/VaultDashboard';
 import { VaultCards } from '../features/vault/pages/VaultCards';
 import { VaultAnalytics } from '../features/vault/pages/VaultAnalytics';
 import { RoadmapDashboard } from '../features/roadmap/pages/RoadmapDashboard';
+import { VaultReviewSession } from '../features/vault/pages/VaultReviewSession';
 import { EcosystemDashboard } from '../features/skeletons/pages/EcosystemDashboard';
 import { LearningHubSkeleton } from '../features/skeletons/pages/LearningHubSkeleton';
-import { KnowledgeTrainerSkeleton } from '../features/skeletons/pages/KnowledgeTrainerSkeleton';
+import { KnowledgeTrainerDashboard } from '../features/knowledge-trainer/pages/KnowledgeTrainerDashboard';
 import { AnalyticsSkeleton } from '../features/skeletons/pages/AnalyticsSkeleton';
 import { AIToolsSkeleton } from '../features/skeletons/pages/AIToolsSkeleton';
-import { PDFSystemSkeleton } from '../features/skeletons/pages/PDFSystemSkeleton';
+import { PdfLibrary } from '../features/pdf/pages/PdfLibrary';
+import { PdfReader } from '../features/pdf/pages/PdfReader';
 import { ProjectVaultSkeleton } from '../features/skeletons/pages/ProjectVaultSkeleton';
 import { CalendarSkeleton } from '../features/skeletons/pages/CalendarSkeleton';
 import { NotificationsSkeleton } from '../features/skeletons/pages/NotificationsSkeleton';
@@ -107,6 +109,18 @@ export function AppRoutes() {
         <Route path="analytics" element={<VaultAnalytics />} />
       </Route>
 
+      {/* Global Review Queue */}
+      <Route
+        path="/vault/review"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <VaultReviewSession />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
       {/* Roadmap & Ecosystem */}
       <Route
         path="/roadmap"
@@ -131,10 +145,14 @@ export function AppRoutes() {
 
       {/* Skeletons */}
       <Route path="/learning" element={<ProtectedRoute><DashboardLayout><LearningHubSkeleton /></DashboardLayout></ProtectedRoute>} />
-      <Route path="/trainer" element={<ProtectedRoute><DashboardLayout><KnowledgeTrainerSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/trainer" element={<ProtectedRoute><DashboardLayout><KnowledgeTrainerDashboard /></DashboardLayout></ProtectedRoute>} />
       <Route path="/analytics" element={<ProtectedRoute><DashboardLayout><AnalyticsSkeleton /></DashboardLayout></ProtectedRoute>} />
       <Route path="/ai" element={<ProtectedRoute><DashboardLayout><AIToolsSkeleton /></DashboardLayout></ProtectedRoute>} />
-      <Route path="/pdf" element={<ProtectedRoute><DashboardLayout><PDFSystemSkeleton /></DashboardLayout></ProtectedRoute>} />
+      
+      {/* PDF System */}
+      <Route path="/pdf" element={<ProtectedRoute><DashboardLayout><PdfLibrary /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/pdf/:id" element={<ProtectedRoute><PdfReader /></ProtectedRoute>} />
+      
       <Route path="/projects" element={<ProtectedRoute><DashboardLayout><ProjectVaultSkeleton /></DashboardLayout></ProtectedRoute>} />
       <Route path="/calendar" element={<ProtectedRoute><DashboardLayout><CalendarSkeleton /></DashboardLayout></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute><DashboardLayout><NotificationsSkeleton /></DashboardLayout></ProtectedRoute>} />
