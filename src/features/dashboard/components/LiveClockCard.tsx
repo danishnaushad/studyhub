@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card } from '../../../components/ui/Card';
-import { Settings, X } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
+import { Settings, X, Monitor, Palette, Globe } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeProvider';
 import { useFocusStore } from '../../../store/focusStore';
 import { cn } from '../../../lib/utils';
@@ -15,7 +14,7 @@ interface ClockSettings {
   fontSize: 'small' | 'medium' | 'large';
   displayMode: 'digital' | 'analog' | 'both';
   accentColor: string;
-  analogTheme: 'minimal' | 'focus-ring' | 'dark-academic' | 'terminal' | 'nord';
+  analogTheme: 'minimal' | 'linear' | 'flocus' | 'modern-glass';
   digitalTheme: 'minimal' | 'terminal' | 'apple' | 'dashboard' | 'focus';
 }
 
@@ -27,16 +26,21 @@ const DEFAULT_SETTINGS: ClockSettings = {
   timezone: 'local',
   fontSize: 'medium',
   displayMode: 'both',
-  accentColor: 'hsl(var(--primary))',
-  analogTheme: 'minimal',
-  digitalTheme: 'minimal'
+  accentColor: '#8b5cf6', // Default purple accent
+  analogTheme: 'modern-glass',
+  digitalTheme: 'apple'
 };
 
 const TIMEZONES = [
   { value: 'local', label: 'Local Time' },
   { value: 'UTC', label: 'UTC' },
   { value: 'America/New_York', label: 'New York (EST)' },
+  { value: 'America/Chicago', label: 'Chicago (CST)' },
+  { value: 'America/Denver', label: 'Denver (MST)' },
+  { value: 'America/Los_Angeles', label: 'Los Angeles (PST)' },
   { value: 'Europe/London', label: 'London (GMT)' },
+  { value: 'Europe/Paris', label: 'Paris (CET)' },
+  { value: 'Asia/Dubai', label: 'Dubai (GST)' },
   { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
   { value: 'Australia/Sydney', label: 'Sydney (AEST)' }
 ];
@@ -49,8 +53,16 @@ export function LiveClockCard() {
   const [settings, setSettings] = useState<ClockSettings>(() => {
     const saved = localStorage.getItem('studyos_clock_settings');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      return { ...DEFAULT_SETTINGS, ...parsed };
+      try {
+        const parsed = JSON.parse(saved);
+        // Map old themes to new ones
+        if (!['minimal', 'linear', 'flocus', 'modern-glass'].includes(parsed.analogTheme)) {
+          parsed.analogTheme = 'modern-glass';
+        }
+        return { ...DEFAULT_SETTINGS, ...parsed };
+      } catch {
+        return DEFAULT_SETTINGS;
+      }
     }
     return DEFAULT_SETTINGS;
   });
@@ -96,84 +108,57 @@ export function LiveClockCard() {
     large: 'text-7xl md:text-[80px]'
   };
 
-  const isReadabilityMode = settings.displayMode === 'analog';
-
-
-
   const getAnalogThemeColors = () => {
-    if (isReadabilityMode) {
-      return {
-        container: 'bg-white border-8 border-slate-800 shadow-xl text-slate-800',
-        dot: 'bg-slate-800 w-4 h-4',
-        tickMajor: 'bg-slate-800 w-1',
-        tickMinor: 'bg-slate-400 w-0.5',
-        hourHand: 'bg-slate-800 w-2.5',
-        minuteHand: 'bg-slate-600 w-1.5',
-        secondHand: 'bg-red-600 w-[2px]',
-        borderStyle: {}
-      };
-    }
-
     switch (settings.analogTheme) {
-      case 'dark-academic': return {
-        container: 'bg-[#2c241b] border-4 border-[#c19a6b] shadow-lg',
-        dot: 'bg-[#c19a6b] w-3 h-3',
-        tickMajor: 'bg-[#c19a6b] opacity-80 w-1.5',
-        tickMinor: 'bg-[#c19a6b] opacity-40 w-0.5',
-        hourHand: 'bg-[#c19a6b] w-2',
-        minuteHand: 'bg-[#c19a6b] w-1.5',
-        secondHand: 'bg-[#d4af37] w-[2px]',
-        borderStyle: {}
+      case 'linear': return {
+        container: 'bg-transparent shadow-none',
+        dot: 'bg-foreground w-2 h-2 shadow-[0_0_8px_rgba(255,255,255,0.8)]',
+        tickMajor: 'bg-foreground opacity-80 w-[1px]',
+        tickMinor: 'bg-foreground opacity-20 w-[1px]',
+        hourHand: 'bg-foreground opacity-90 w-[2px] rounded-full',
+        minuteHand: 'bg-foreground opacity-60 w-[1.5px] rounded-full',
+        secondHand: `bg-[${settings.accentColor}] w-[1px] shadow-[0_0_8px_${settings.accentColor}80]`,
+        borderStyle: { border: '1px solid rgba(150,150,150,0.1)' }
       };
-      case 'terminal': return {
-        container: 'bg-black border-2 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]',
-        dot: 'bg-green-500 w-3 h-3 shadow-[0_0_5px_rgba(34,197,94,0.5)]',
-        tickMajor: 'bg-green-500 opacity-90 w-1.5 shadow-[0_0_5px_rgba(34,197,94,0.5)]',
-        tickMinor: 'bg-green-500 opacity-50 w-0.5',
-        hourHand: 'bg-green-400 w-1.5 shadow-[0_0_5px_rgba(34,197,94,0.5)]',
-        minuteHand: 'bg-green-400 w-1 shadow-[0_0_5px_rgba(34,197,94,0.5)]',
-        secondHand: 'bg-green-600 w-[2px]',
-        borderStyle: {}
+      case 'flocus': return {
+        container: 'bg-black/80 dark:bg-black/40 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]',
+        dot: `bg-[${settings.accentColor}] w-3 h-3`,
+        tickMajor: 'bg-white opacity-60 w-1 rounded-full',
+        tickMinor: 'hidden', // Minimalist tick approach
+        hourHand: 'bg-white opacity-90 w-[3px] rounded-full',
+        minuteHand: 'bg-white opacity-70 w-[2px] rounded-full',
+        secondHand: `bg-[${settings.accentColor}] w-[1px]`,
+        borderStyle: { border: '1px solid rgba(255,255,255,0.1)', boxShadow: 'inset 0 0 20px rgba(255,255,255,0.02)' }
       };
-      case 'nord': return {
-        container: 'bg-[#2e3440] border-[6px] border-[#4c566a] shadow-md',
-        dot: 'bg-[#88c0d0] w-3 h-3',
-        tickMajor: 'bg-[#d8dee9] opacity-80 w-1.5',
-        tickMinor: 'bg-[#d8dee9] opacity-30 w-0.5',
-        hourHand: 'bg-[#81a1c1] w-2',
-        minuteHand: 'bg-[#88c0d0] w-1.5',
-        secondHand: 'bg-[#bf616a] w-[2px]',
-        borderStyle: {}
-      };
-      case 'focus-ring': return {
-        container: 'bg-background border-2 border-primary shadow-lg ring-4 ring-primary/20',
-        dot: 'bg-primary w-4 h-4',
-        tickMajor: 'bg-primary opacity-60 w-2',
-        tickMinor: 'bg-primary opacity-30 w-1',
-        hourHand: 'bg-foreground w-2',
-        minuteHand: 'bg-foreground w-1.5',
-        secondHand: 'bg-primary w-[3px]',
+      case 'modern-glass': return {
+        container: 'bg-white/5 backdrop-blur-2xl shadow-[0_0_40px_rgba(139,92,246,0.15)] ring-1 ring-white/10 dark:ring-white/5',
+        dot: `bg-[${settings.accentColor}] w-2.5 h-2.5 shadow-[0_0_12px_${settings.accentColor}aa]`,
+        tickMajor: 'bg-foreground opacity-50 w-0.5 rounded-full',
+        tickMinor: 'bg-foreground opacity-10 w-[1px]',
+        hourHand: 'bg-foreground opacity-90 w-1 rounded-full shadow-lg',
+        minuteHand: 'bg-foreground opacity-60 w-[2px] rounded-full shadow-md',
+        secondHand: `bg-[${settings.accentColor}] w-[1px] shadow-[0_0_10px_${settings.accentColor}]`,
         borderStyle: {}
       };
       case 'minimal':
       default: return {
-        container: 'bg-background shadow-inner',
-        dot: '', 
-        tickMajor: 'bg-foreground opacity-80 w-1.5',
-        tickMinor: 'bg-muted-foreground opacity-40 w-0.5',
-        hourHand: 'bg-foreground opacity-90 w-1.5',
-        minuteHand: 'bg-current opacity-70 w-1',
-        secondHand: '',
-        borderStyle: { border: `6px solid ${settings.accentColor}20` }
+        container: 'bg-transparent shadow-none',
+        dot: 'bg-foreground w-1.5 h-1.5',
+        tickMajor: 'bg-foreground opacity-60 w-0.5',
+        tickMinor: 'bg-foreground opacity-20 w-[1px]',
+        hourHand: 'bg-foreground opacity-90 w-0.5',
+        minuteHand: 'bg-foreground opacity-60 w-[1px]',
+        secondHand: `bg-[${settings.accentColor}] w-[1px]`,
+        borderStyle: {}
       };
     }
   };
 
   const getDigitalThemeClasses = () => {
     switch (settings.digitalTheme) {
-      case 'terminal': return 'font-mono text-green-500 bg-black/90 p-3 rounded-xl border border-green-500/30';
       case 'apple': return 'font-sans tracking-tight font-light text-foreground';
-      case 'dashboard': return 'font-mono tracking-widest text-primary uppercase bg-primary/5 p-2 rounded';
+      case 'terminal': return 'font-mono text-green-500 bg-black/90 p-3 rounded-xl border border-green-500/30';
+      case 'dashboard': return 'font-mono tracking-widest uppercase bg-primary/5 p-2 rounded';
       case 'focus': return 'font-serif opacity-90 tracking-widest font-bold leading-none';
       case 'minimal':
       default: return 'font-black tracking-tighter tabular-nums text-foreground';
@@ -185,81 +170,52 @@ export function LiveClockCard() {
 
   return (
     <Card className={cn(
-      "border-primary/10 shadow-sm overflow-hidden flex flex-col items-center justify-center p-8 bg-gradient-to-br from-card to-muted/20 relative min-h-[300px] transition-all duration-1000",
+      "border-primary/5 shadow-sm overflow-hidden flex flex-col items-center justify-center p-8 bg-gradient-to-br from-card to-muted/10 relative min-h-[300px] transition-all duration-1000",
       isMidnightActive && "shadow-[0_0_30px_rgba(124,58,237,0.1)] border-indigo-500/30"
     )}>
       
-      {!showSettings && (
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="absolute top-2 right-2 text-muted-foreground hover:text-primary z-10"
-          onClick={() => setShowSettings(true)}
-        >
-          <Settings className="w-4 h-4" />
-        </Button>
-      )}
+      {/* Floating Action Button for Settings */}
+      <button 
+        className={cn(
+          "absolute top-4 right-4 z-10 flex items-center justify-center w-[40px] h-[40px] rounded-full",
+          "bg-slate-900/75 backdrop-blur-[12px] border border-purple-500/25",
+          "text-white/70 hover:text-white transition-all duration-300 ease-out",
+          "hover:scale-105 hover:bg-slate-800/80 hover:border-purple-500/50 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]",
+          showSettings && "opacity-0 pointer-events-none"
+        )}
+        onClick={() => setShowSettings(true)}
+      >
+        <Settings className="w-4 h-4 transition-transform hover:rotate-90 duration-500" />
+      </button>
 
-      <div className="flex flex-col items-center justify-center gap-8 w-full">
+      <div className="flex flex-col items-center justify-center gap-10 w-full z-0 relative">
         {(settings.displayMode === 'analog' || settings.displayMode === 'both') && (
           <div 
-            className={`relative w-48 h-48 md:w-56 md:h-56 rounded-full shrink-0 transition-colors ${t.container}`} 
+            className={`relative w-48 h-48 md:w-56 md:h-56 rounded-full shrink-0 transition-all duration-500 ${t.container}`} 
             style={t.borderStyle}
           >
-            {/* Center dot */}
+            {/* Center pivot dot */}
             <div 
-              className={`absolute top-1/2 left-1/2 rounded-full -translate-x-1/2 -translate-y-1/2 z-20 ${t.dot || 'w-3 h-3'}`} 
-              style={!t.dot ? { backgroundColor: settings.accentColor } : {}} 
+              className={`absolute top-1/2 left-1/2 rounded-full -translate-x-1/2 -translate-y-1/2 z-20 ${t.dot}`} 
             />
             
-            {/* Clock marks & Numbers */}
-            {isReadabilityMode ? (
-              <>
-                {Array.from({ length: 60 }).map((_, i) => {
-                  const isHour = i % 5 === 0;
-                  return (
-                    <div 
-                      key={`tick-${i}`}
-                      className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 ${isHour ? t.tickMajor : t.tickMinor}`}
-                      style={{ transform: `rotate(${i * 6}deg)`, paddingBottom: isHour ? 'calc(100% - 16px)' : 'calc(100% - 8px)' }}
-                    />
-                  );
-                })}
-                {Array.from({ length: 12 }).map((_, i) => {
-                  const num = i === 0 ? 12 : i;
-                  const angle = (num * 30 - 90) * (Math.PI / 180);
-                  const radius = 38;
-                  const x = 50 + radius * Math.cos(angle);
-                  const y = 50 + radius * Math.sin(angle);
-                  return (
-                    <div 
-                      key={`num-${num}`}
-                      className="absolute font-bold text-lg md:text-xl -translate-x-1/2 -translate-y-1/2 text-slate-800"
-                      style={{ left: `${x}%`, top: `${y}%` }}
-                    >
-                      {num}
-                    </div>
-                  );
-                })}
-              </>
-            ) : (
-              <>
-                {[0, 3, 6, 9].map(h => (
-                  <div 
-                    key={`h-${h}`} 
-                    className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 ${t.tickMajor}`}
-                    style={{ transform: `rotate(${h * 30}deg)`, paddingBottom: 'calc(100% - 16px)' }}
-                  />
-                ))}
-                {[1, 2, 4, 5, 7, 8, 10, 11].map(h => (
-                  <div 
-                    key={`h-${h}`} 
-                    className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 ${t.tickMinor}`}
-                    style={{ transform: `rotate(${h * 30}deg)`, paddingBottom: 'calc(100% - 8px)' }}
-                  />
-                ))}
-              </>
-            )}
+            {/* Clock ticks */}
+            {[...Array(60)].map((_, i) => {
+              const isHour = i % 5 === 0;
+              if (!isHour && t.tickMinor === 'hidden') return null;
+              
+              return (
+                <div 
+                  key={`tick-${i}`}
+                  className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 ${isHour ? t.tickMajor : t.tickMinor}`}
+                  style={{ 
+                    transform: `rotate(${i * 6}deg)`, 
+                    paddingBottom: isHour ? 'calc(100% - 12px)' : 'calc(100% - 6px)',
+                    background: isHour && settings.analogTheme === 'modern-glass' ? settings.accentColor : undefined
+                  }}
+                />
+              );
+            })}
 
             {/* Hour hand */}
             <div 
@@ -276,11 +232,8 @@ export function LiveClockCard() {
             {/* Second hand */}
             {settings.showSeconds && (
               <div 
-                className={`absolute top-1/2 left-1/2 origin-bottom -translate-x-1/2 rounded-full z-10 ${t.secondHand || 'w-[2px] bg-current opacity-50'} h-20 md:h-24`}
-                style={{ 
-                  backgroundColor: !t.secondHand ? settings.accentColor : undefined, 
-                  transform: `translateX(-50%) translateY(-100%) rotate(${secondDeg}deg)` 
-                }}
+                className={`absolute top-1/2 left-1/2 origin-bottom -translate-x-1/2 rounded-full z-10 ${t.secondHand} h-20 md:h-24`}
+                style={{ transform: `translateX(-50%) translateY(-100%) rotate(${secondDeg}deg)` }}
               />
             )}
           </div>
@@ -288,19 +241,20 @@ export function LiveClockCard() {
 
         {(settings.displayMode === 'digital' || settings.displayMode === 'both') && (
           <div className={`flex flex-col items-center text-center ${getDigitalThemeClasses()}`}>
-            <div className={`${settings.digitalTheme === 'focus' ? 'text-7xl md:text-[110px]' : sizeClasses[settings.fontSize]} flex items-baseline`}>
+            <div className={`${settings.digitalTheme === 'focus' ? 'text-7xl md:text-[110px]' : sizeClasses[settings.fontSize]} flex items-baseline`} style={{ color: settings.digitalTheme === 'dashboard' ? settings.accentColor : undefined }}>
               {displayHours}:{minutes.toString().padStart(2, '0')}
               {settings.showSeconds && (
-                <span className="text-xl md:text-2xl opacity-70 font-semibold tracking-normal ml-1">
-                  :{seconds.toString().padStart(2, '0')}
+                <span className="text-xl md:text-2xl opacity-50 font-semibold tracking-normal ml-1.5">
+                  {seconds.toString().padStart(2, '0')}
                 </span>
               )}
-              {ampm && <span className="text-sm font-bold ml-2 opacity-60">{ampm}</span>}
+              {ampm && <span className="text-sm font-bold ml-2 opacity-40">{ampm}</span>}
             </div>
             
             {(settings.showDate || settings.showDayOfWeek) && (
-              <div className="text-xs uppercase tracking-widest opacity-60 font-semibold mt-2 flex flex-col gap-0.5">
+              <div className="text-[11px] md:text-xs uppercase tracking-[0.2em] opacity-40 font-semibold mt-3 flex gap-2">
                 {settings.showDayOfWeek && <span>{targetTime.toLocaleDateString(undefined, { weekday: 'long' })}</span>}
+                {settings.showDate && settings.showDayOfWeek && <span>•</span>}
                 {settings.showDate && <span>{targetTime.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>}
               </div>
             )}
@@ -308,101 +262,194 @@ export function LiveClockCard() {
         )}
       </div>
 
+      {/* Premium Settings Drawer */}
       {showSettings && (
-        <div className="absolute inset-0 bg-background/95 backdrop-blur-sm z-30 flex flex-col p-4 animate-in fade-in duration-200 overflow-y-auto">
-          <div className="flex justify-between items-center mb-4 border-b pb-2">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">Clock Settings</h3>
-            <Button variant="ghost" size="icon" onClick={() => setShowSettings(false)}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="space-y-4 flex-1 text-sm pb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-end pr-4 sm:pr-8 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-[rgba(5,10,25,.75)] backdrop-blur-[12px]" onClick={() => setShowSettings(false)} />
+          
+          <div className="relative w-full max-w-[440px] max-h-[80vh] flex flex-col bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10 animate-in slide-in-from-right-8 duration-400 ease-out">
             
-            <div className="space-y-2">
-              <label className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">Display Mode</label>
-              <select className="w-full p-2 rounded border bg-background" value={settings.displayMode} onChange={e => updateSetting('displayMode', e.target.value as any)}>
-                <option value="both">Analog + Digital</option>
-                <option value="analog">Analog Only</option>
-                <option value="digital">Digital Only</option>
-              </select>
-              {settings.displayMode === 'analog' && (
-                <p className="text-xs text-muted-foreground mt-1 bg-muted p-2 rounded border-l-2 border-primary">
-                  Analog Only automatically enables enhanced readability.
-                </p>
-              )}
-            </div>
-
-            {(settings.displayMode === 'analog' || settings.displayMode === 'both') && (
-              <div className="space-y-2">
-                <label className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">Analog Theme</label>
-                <select className="w-full p-2 rounded border bg-background" value={settings.analogTheme} onChange={e => updateSetting('analogTheme', e.target.value as any)}>
-                  <option value="minimal">Minimal Classic</option>
-                  <option value="focus-ring">Focus Ring</option>
-                  <option value="dark-academic">Dark Academic</option>
-                  <option value="terminal">Terminal Analog</option>
-                  <option value="nord">Nord Clock</option>
-                </select>
+            {/* Header */}
+            <div className="flex justify-between items-start p-6 border-b border-white/5 bg-white/[0.02] shrink-0">
+              <div>
+                <h3 className="text-lg font-bold text-white tracking-tight">Clock Settings</h3>
+                <p className="text-xs text-white/50 mt-1">Customize your dashboard clock</p>
               </div>
-            )}
-
-            {(settings.displayMode === 'digital' || settings.displayMode === 'both') && (
-              <div className="space-y-2">
-                <label className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">Digital Theme</label>
-                <select className="w-full p-2 rounded border bg-background" value={settings.digitalTheme} onChange={e => updateSetting('digitalTheme', e.target.value as any)}>
-                  <option value="minimal">Minimal Digital</option>
-                  <option value="terminal">Terminal Clock</option>
-                  <option value="apple">Apple Style</option>
-                  <option value="dashboard">Dashboard Compact</option>
-                  <option value="focus">Focus Mode Clock</option>
-                </select>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <label className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">Timezone</label>
-              <select className="w-full p-2 rounded border bg-background" value={settings.timezone} onChange={e => updateSetting('timezone', e.target.value)}>
-                {TIMEZONES.map(tz => <option key={tz.value} value={tz.value}>{tz.label}</option>)}
-              </select>
+              <button 
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all"
+                onClick={() => setShowSettings(false)}
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 bg-muted/30 p-3 rounded-lg border">
-              <label className="flex items-center gap-2 cursor-pointer font-medium">
-                <input type="checkbox" checked={settings.use24Hour} onChange={e => updateSetting('use24Hour', e.target.checked)} className="accent-primary" />
-                24h Format
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer font-medium">
-                <input type="checkbox" checked={settings.showSeconds} onChange={e => updateSetting('showSeconds', e.target.checked)} className="accent-primary" />
-                Show Seconds
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer font-medium">
-                <input type="checkbox" checked={settings.showDate} onChange={e => updateSetting('showDate', e.target.checked)} className="accent-primary" />
-                Show Date
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer font-medium">
-                <input type="checkbox" checked={settings.showDayOfWeek} onChange={e => updateSetting('showDayOfWeek', e.target.checked)} className="accent-primary" />
-                Show Day
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">Digital Size</label>
-              <div className="flex gap-2">
-                {['small', 'medium', 'large'].map(s => (
-                  <Button key={s} size="sm" variant={settings.fontSize === s ? 'default' : 'outline'} className="flex-1 capitalize" onClick={() => updateSetting('fontSize', s as any)}>
-                    {s}
-                  </Button>
-                ))}
-              </div>
-            </div>
+            {/* Scrollable Content */}
+            <style>{`
+              .clock-settings-scroll::-webkit-scrollbar { display: none; }
+              .clock-settings-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+              .premium-select {
+                appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 1rem center;
+                background-size: 1em;
+              }
+            `}</style>
             
-            <div className="space-y-2">
-              <label className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">Accent Color</label>
-              <div className="flex gap-2">
-                {['hsl(var(--primary))', '#3b82f6', '#10b981', '#f43f5e', '#8b5cf6'].map(c => (
-                  <button key={c} className="w-8 h-8 rounded-full border-2 border-background ring-1 ring-border shadow-sm transition-transform hover:scale-110" style={{ backgroundColor: c }} onClick={() => updateSetting('accentColor', c)} />
-                ))}
-              </div>
+            <div className="flex-1 overflow-y-auto clock-settings-scroll p-6 space-y-8 text-sm">
+              
+              {/* Display Section */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 text-white/80 font-medium mb-2">
+                  <Monitor className="w-4 h-4 text-purple-400" />
+                  <h4>Display</h4>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-[11px] uppercase tracking-wider text-white/40 font-semibold pl-1">Display Mode</label>
+                  <select 
+                    className="premium-select w-full h-[48px] px-4 rounded-xl bg-[rgba(255,255,255,.03)] border border-[rgba(255,255,255,.08)] text-white/90 focus:outline-none focus:border-purple-500/50 hover:border-purple-500/35 transition-colors"
+                    value={settings.displayMode} 
+                    onChange={e => updateSetting('displayMode', e.target.value as any)}
+                  >
+                    <option value="both" className="bg-[#0f172a]">Analog + Digital</option>
+                    <option value="analog" className="bg-[#0f172a]">Analog Only</option>
+                    <option value="digital" className="bg-[#0f172a]">Digital Only</option>
+                  </select>
+                </div>
+              </section>
+
+              {/* Appearance Section */}
+              <section className="space-y-4 pt-2 border-t border-white/5">
+                <div className="flex items-center gap-2 text-white/80 font-medium mb-2">
+                  <Palette className="w-4 h-4 text-purple-400" />
+                  <h4>Appearance</h4>
+                </div>
+
+                {(settings.displayMode === 'analog' || settings.displayMode === 'both') && (
+                  <div className="space-y-2">
+                    <label className="text-[11px] uppercase tracking-wider text-white/40 font-semibold pl-1">Analog Theme</label>
+                    <select 
+                      className="premium-select w-full h-[48px] px-4 rounded-xl bg-[rgba(255,255,255,.03)] border border-[rgba(255,255,255,.08)] text-white/90 focus:outline-none focus:border-purple-500/50 hover:border-purple-500/35 transition-colors"
+                      value={settings.analogTheme} 
+                      onChange={e => updateSetting('analogTheme', e.target.value as any)}
+                    >
+                      <option value="modern-glass" className="bg-[#0f172a]">Modern Glass (Premium)</option>
+                      <option value="linear" className="bg-[#0f172a]">Linear Style</option>
+                      <option value="flocus" className="bg-[#0f172a]">Flocus Style</option>
+                      <option value="minimal" className="bg-[#0f172a]">Minimal Classic</option>
+                    </select>
+                  </div>
+                )}
+
+                {(settings.displayMode === 'digital' || settings.displayMode === 'both') && (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-[11px] uppercase tracking-wider text-white/40 font-semibold pl-1">Digital Theme</label>
+                      <select 
+                        className="premium-select w-full h-[48px] px-4 rounded-xl bg-[rgba(255,255,255,.03)] border border-[rgba(255,255,255,.08)] text-white/90 focus:outline-none focus:border-purple-500/50 hover:border-purple-500/35 transition-colors"
+                        value={settings.digitalTheme} 
+                        onChange={e => updateSetting('digitalTheme', e.target.value as any)}
+                      >
+                        <option value="apple" className="bg-[#0f172a]">Apple Style</option>
+                        <option value="minimal" className="bg-[#0f172a]">Minimal Heavy</option>
+                        <option value="dashboard" className="bg-[#0f172a]">Dashboard Compact</option>
+                        <option value="focus" className="bg-[#0f172a]">Focus Serif</option>
+                        <option value="terminal" className="bg-[#0f172a]">Terminal Mono</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[11px] uppercase tracking-wider text-white/40 font-semibold pl-1">Digital Size</label>
+                      <div className="flex gap-2 h-[48px] p-1 bg-[rgba(255,255,255,.03)] border border-[rgba(255,255,255,.08)] rounded-xl">
+                        {['small', 'medium', 'large'].map(s => (
+                          <button 
+                            key={s} 
+                            className={cn(
+                              "flex-1 rounded-lg text-xs font-medium transition-all capitalize",
+                              settings.fontSize === s ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" : "text-white/40 hover:text-white/80 hover:bg-white/5"
+                            )}
+                            onClick={() => updateSetting('fontSize', s as any)}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className="space-y-3">
+                  <label className="text-[11px] uppercase tracking-wider text-white/40 font-semibold pl-1">Accent Color</label>
+                  <div className="flex gap-4 px-1">
+                    {['#8b5cf6', '#3b82f6', '#10b981', '#f43f5e', '#eab308', '#ffffff'].map(c => (
+                      <button 
+                        key={c} 
+                        className={cn(
+                          "w-8 h-8 rounded-full border-2 transition-all hover:scale-110 shadow-lg",
+                          settings.accentColor === c ? "border-white ring-2 ring-purple-500/50 scale-110" : "border-white/10"
+                        )}
+                        style={{ backgroundColor: c }} 
+                        onClick={() => updateSetting('accentColor', c)} 
+                      />
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* Localization Section */}
+              <section className="space-y-4 pt-2 border-t border-white/5">
+                <div className="flex items-center gap-2 text-white/80 font-medium mb-2">
+                  <Globe className="w-4 h-4 text-purple-400" />
+                  <h4>Localization</h4>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] uppercase tracking-wider text-white/40 font-semibold pl-1">Timezone</label>
+                  <select 
+                    className="premium-select w-full h-[48px] px-4 rounded-xl bg-[rgba(255,255,255,.03)] border border-[rgba(255,255,255,.08)] text-white/90 focus:outline-none focus:border-purple-500/50 hover:border-purple-500/35 transition-colors"
+                    value={settings.timezone} 
+                    onChange={e => updateSetting('timezone', e.target.value)}
+                  >
+                    {TIMEZONES.map(tz => <option key={tz.value} value={tz.value} className="bg-[#0f172a]">{tz.label}</option>)}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  {[
+                    { key: 'use24Hour', label: '24-Hour Format' },
+                    { key: 'showSeconds', label: 'Show Seconds' },
+                    { key: 'showDate', label: 'Show Date' },
+                    { key: 'showDayOfWeek', label: 'Show Day' }
+                  ].map(toggle => (
+                    <label 
+                      key={toggle.key} 
+                      className="flex flex-col gap-3 p-4 rounded-xl bg-[rgba(255,255,255,.02)] border border-[rgba(255,255,255,.05)] hover:bg-[rgba(255,255,255,.04)] cursor-pointer transition-colors"
+                    >
+                      <div className="flex justify-between items-center w-full">
+                        <span className="text-xs text-white/80 font-medium">{toggle.label}</span>
+                        {/* Custom minimal toggle switch */}
+                        <div className={cn(
+                          "w-8 h-4 rounded-full transition-colors relative",
+                          settings[toggle.key as keyof ClockSettings] ? "bg-purple-500" : "bg-white/10"
+                        )}>
+                          <div className={cn(
+                            "absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform shadow-sm",
+                            settings[toggle.key as keyof ClockSettings] ? "translate-x-4.5 left-[18px]" : "translate-x-0.5 left-0"
+                          )} />
+                        </div>
+                      </div>
+                      <input 
+                        type="checkbox" 
+                        className="hidden"
+                        checked={settings[toggle.key as keyof ClockSettings] as boolean} 
+                        onChange={e => updateSetting(toggle.key as keyof ClockSettings, e.target.checked as never)} 
+                      />
+                    </label>
+                  ))}
+                </div>
+              </section>
+
             </div>
           </div>
         </div>
