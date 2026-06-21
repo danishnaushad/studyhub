@@ -1,27 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { getCategoryColor } from '../../../lib/colors';
-import type { Question } from '../../../types';
-import { getMasteryLevel } from '../utils/vaultHelpers';
+
+
+import type { MasteryLevelInfo } from '../utils/vaultHelpers';
+
+export interface CategoryStat {
+  id: string;
+  name: string;
+  color: string;
+  total: number;
+  avgMastery: number;
+  mastered: number;
+  dueNow: number;
+  level: MasteryLevelInfo;
+}
 
 interface CategoryMasteryGridProps {
-  questions: Question[];
-  categories: { id: string; name: string; color: string }[];
+  categoryStats: CategoryStat[];
   disableSurface?: boolean;
 }
 
-export function CategoryMasteryGrid({ questions, categories, disableSurface }: CategoryMasteryGridProps) {
-  const categoryStats = categories.map(cat => {
-    const catQuestions = questions.filter(q => q.categoryId === cat.id);
-    const total = catQuestions.length;
-    const avgMastery = total > 0
-      ? Math.round(catQuestions.reduce((sum, q) => sum + (q.masteryScore || 0), 0) / total)
-      : 0;
-    const mastered = catQuestions.filter(q => (q.masteryScore || 0) >= 90).length;
-    const dueNow = catQuestions.filter(q => q.status !== 'mastered' && (!q.nextReview || q.nextReview <= Date.now())).length;
-    const level = getMasteryLevel(avgMastery, total > 0 ? 1 : 0);
-
-    return { ...cat, total, avgMastery, mastered, dueNow, level };
-  }).filter(c => c.total > 0);
+export function CategoryMasteryGrid({ categoryStats, disableSurface }: CategoryMasteryGridProps) {
 
   if (categoryStats.length === 0) {
     return null;

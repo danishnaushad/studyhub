@@ -3,14 +3,16 @@ import { Button } from '../../../components/ui/Button';
 import { Activity, CalendarDays, TrendingUp, BarChart3, PlayCircle, Flame, Target } from 'lucide-react';
 import { WeakConceptsList } from '../components/WeakConceptsList';
 import { CategoryMasteryGrid } from '../components/CategoryMasteryGrid';
-import { MOCK_QUESTIONS, MOCK_CATEGORIES, computeVaultStats, MASTERY_LEVELS } from '../utils/vaultHelpers';
+import { MASTERY_LEVELS } from '../utils/vaultHelpers';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, YAxis, Cell } from 'recharts';
 import { useTheme } from '../../../contexts/ThemeProvider';
+import { useVault } from '../hooks/useVault';
+import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
 
 export function VaultAnalytics() {
   const { theme } = useTheme();
   const isDark = theme !== 'light';
-  const stats = computeVaultStats(MOCK_QUESTIONS);
+  const { questions, stats, categoryStats, loading } = useVault();
 
   // Generate mock heatmap data for the last 12 weeks
   const heatmapWeeks: { date: string; count: number; level: number }[][] = [];
@@ -43,6 +45,15 @@ export function VaultAnalytics() {
     { day: 'Sat', reviews: 14 },
     { day: 'Sun', reviews: 10 },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <LoadingSpinner className="w-8 h-8 mb-4 text-primary" />
+        <p>Loading analytics...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 pb-16">
@@ -114,7 +125,7 @@ export function VaultAnalytics() {
       {/* 2. ACTIONABLE INSIGHTS */}
       <section className="space-y-4">
         <h3 className="text-xl font-bold tracking-tight px-1">Actionable Insights</h3>
-        <WeakConceptsList questions={MOCK_QUESTIONS} limit={4} />
+        <WeakConceptsList questions={questions} limit={4} />
       </section>
 
       {/* 3. ACTIVITY */}
@@ -214,7 +225,7 @@ export function VaultAnalytics() {
         
         {/* Category Mastery */}
         <div className="mb-6">
-          <CategoryMasteryGrid questions={MOCK_QUESTIONS} categories={MOCK_CATEGORIES} disableSurface={true} />
+          <CategoryMasteryGrid categoryStats={categoryStats} disableSurface={true} />
         </div>
 
         {/* Mastery Distribution Redesign */}

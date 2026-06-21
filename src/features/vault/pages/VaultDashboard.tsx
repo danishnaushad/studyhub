@@ -4,10 +4,20 @@ import { Button } from '../../../components/ui/Button';
 import { VaultStatsBar } from '../components/VaultStatsBar';
 import { CategoryMasteryGrid } from '../components/CategoryMasteryGrid';
 import { MasteryLevelBadge } from '../components/MasteryLevelBadge';
-import { MOCK_QUESTIONS, MOCK_CATEGORIES, computeVaultStats } from '../utils/vaultHelpers';
+import { useVault } from '../hooks/useVault';
+import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
 
 export function VaultDashboard() {
-  const stats = computeVaultStats(MOCK_QUESTIONS);
+  const { stats, categoryStats, loading, categories } = useVault();
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <LoadingSpinner className="w-8 h-8 mb-4 text-primary" />
+        <p>Loading your knowledge vault...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
@@ -47,7 +57,7 @@ export function VaultDashboard() {
                 <MasteryLevelBadge score={stats.avgMastery} reviewCount={stats.total > 0 ? 1 : 0} size="md" showScore={false} />
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                {stats.total} cards across {MOCK_CATEGORIES.length} categories •{' '}
+                {stats.total} cards across {categories.length} categories •{' '}
                 {stats.dueToday > 0 ? (
                   <span className="text-red-500 font-semibold">{stats.dueToday} cards due for review</span>
                 ) : (
@@ -75,7 +85,7 @@ export function VaultDashboard() {
       />
 
       {/* Category Mastery Breakdown */}
-      <CategoryMasteryGrid questions={MOCK_QUESTIONS} categories={MOCK_CATEGORIES} />
+      <CategoryMasteryGrid categoryStats={categoryStats} />
 
       {/* Future Integration Points */}
       <div className="grid gap-4 md:grid-cols-2">

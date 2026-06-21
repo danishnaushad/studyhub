@@ -3,18 +3,21 @@ import { Plus, Search, Filter, FileText } from 'lucide-react';
 import { Card, CardContent } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { MasteryLevelBadge } from '../components/MasteryLevelBadge';
-import { MOCK_QUESTIONS, MOCK_CATEGORIES, MASTERY_LEVELS } from '../utils/vaultHelpers';
+import { MASTERY_LEVELS } from '../utils/vaultHelpers';
+import { useVault } from '../hooks/useVault';
+import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
 import { cn } from '../../../lib/utils';
 
 type StatusFilter = 'all' | 'new' | 'learning' | 'improving' | 'strong' | 'mastered';
 
 export function VaultCards() {
+  const { questions, categories, loading } = useVault();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   const filteredCards = useMemo(() => {
-    let result = MOCK_QUESTIONS;
+    let result = questions;
 
     // Status filter (maps to mastery levels)
     if (statusFilter !== 'all') {
@@ -44,9 +47,18 @@ export function VaultCards() {
     }
 
     return result;
-  }, [searchQuery, statusFilter, categoryFilter]);
+  }, [questions, searchQuery, statusFilter, categoryFilter]);
 
-  const getCategoryName = (id: string) => MOCK_CATEGORIES.find(c => c.id === id)?.name || 'Unknown';
+  const getCategoryName = (id: string) => categories.find(c => c.id === id)?.name || 'Unknown';
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <LoadingSpinner className="w-8 h-8 mb-4 text-primary" />
+        <p>Loading your knowledge vault...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
@@ -55,7 +67,7 @@ export function VaultCards() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">All Cards</h2>
           <p className="text-muted-foreground mt-1">
-            {filteredCards.length} of {MOCK_QUESTIONS.length} cards
+            {filteredCards.length} of {questions.length} cards
           </p>
         </div>
         <Button className="shrink-0 flex items-center gap-2">
@@ -85,7 +97,7 @@ export function VaultCards() {
             className="text-sm bg-background border border-input rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Categories</option>
-            {MOCK_CATEGORIES.map(cat => (
+            {categories.map(cat => (
               <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
           </select>
