@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useAuth } from '../../../hooks/useAuth';
-import { useDemo } from '../../../contexts/DemoContext';
 import { useResources } from '../hooks/useResources';
 import { resourcesService } from '../services/resources.service';
 import { ResourceCard } from '../components/ResourceCard';
@@ -18,7 +17,6 @@ import { PDFWorkspaceReader } from '../components/PDFReader/PDFWorkspaceReader';
 export function WorkspaceResources() {
   const { category } = useWorkspace();
   const { user } = useAuth();
-  const { isDemo } = useDemo();
   const { resources, loading } = useResources(category.id);
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -126,8 +124,6 @@ export function WorkspaceResources() {
         <Button 
           onClick={handleOpenAdd} 
           className="shrink-0 flex items-center gap-2"
-          disabled={isDemo}
-          title={isDemo ? "Disabled in Demo Mode" : undefined}
         >
           <Plus className="h-4 w-4" />
           Add Resource

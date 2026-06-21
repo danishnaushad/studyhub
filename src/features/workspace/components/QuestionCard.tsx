@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Card, CardContent } from '../../../components/ui/Card';
 import type { Question } from '../../../types';
 import { cn } from '../../../lib/utils';
-import { useDemo } from '../../../contexts/DemoContext';
 
 interface QuestionCardProps {
   question: Question;
@@ -13,7 +12,6 @@ interface QuestionCardProps {
 
 export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) {
   const [showMenu, setShowMenu] = useState(false);
-  const { isDemo } = useDemo();
 
   // Defensive Guard for Malformed Documents
   if (!question || !question.id) {
@@ -94,8 +92,6 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
                   <button 
                     className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2 disabled:opacity-50"
                     onClick={(e) => { e.stopPropagation(); setShowMenu(false); onEdit(question); }}
-                    disabled={isDemo}
-                    title={isDemo ? "Disabled in Demo Mode" : undefined}
                   >
                     <Edit2 className="h-3.5 w-3.5" />
                     Edit
@@ -103,8 +99,6 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
                   <button 
                     className="w-full text-left px-4 py-2 text-sm hover:bg-accent text-destructive flex items-center gap-2 disabled:opacity-50"
                     onClick={(e) => { e.stopPropagation(); setShowMenu(false); onDelete(question.id); }}
-                    disabled={isDemo}
-                    title={isDemo ? "Disabled in Demo Mode" : undefined}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Delete

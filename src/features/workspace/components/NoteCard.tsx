@@ -2,7 +2,6 @@ import { MoreVertical, Edit2, Trash2, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { Card, CardContent } from '../../../components/ui/Card';
 import type { Note } from '../../../types';
-import { useDemo } from '../../../contexts/DemoContext';
 
 interface NoteCardProps {
   note: Note;
@@ -12,7 +11,6 @@ interface NoteCardProps {
 
 export function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
   const [showMenu, setShowMenu] = useState(false);
-  const { isDemo } = useDemo();
 
   const formattedDate = new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -23,7 +21,7 @@ export function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
   return (
     <Card 
       className="group relative overflow-hidden hover:shadow-md transition-shadow cursor-pointer flex flex-col"
-      onClick={() => { if (!isDemo) onEdit(note); }}
+      onClick={() => onEdit(note)}
     >
       <CardContent className="p-5 flex-1 flex flex-col">
         <div className="flex items-start justify-between mb-2">
@@ -49,8 +47,6 @@ export function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
                   <button 
                     className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2 disabled:opacity-50"
                     onClick={(e) => { e.stopPropagation(); setShowMenu(false); onEdit(note); }}
-                    disabled={isDemo}
-                    title={isDemo ? "Disabled in Demo Mode" : undefined}
                   >
                     <Edit2 className="h-3.5 w-3.5" />
                     Edit
@@ -58,8 +54,6 @@ export function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
                   <button 
                     className="w-full text-left px-4 py-2 text-sm hover:bg-accent text-destructive flex items-center gap-2 disabled:opacity-50"
                     onClick={(e) => { e.stopPropagation(); setShowMenu(false); onDelete(note.id); }}
-                    disabled={isDemo}
-                    title={isDemo ? "Disabled in Demo Mode" : undefined}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Delete

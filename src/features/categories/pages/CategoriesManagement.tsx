@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Plus, Edit2, Trash2, Layers, AlertCircle } from 'lucide-react';
 import { useCategories } from '../../../hooks/useCategories';
 import { useAuth } from '../../../hooks/useAuth';
-import { useDemo } from '../../../contexts/DemoContext';
 import { categoriesService } from '../services/categories.service';
 import { CategoryFormDialog } from '../components/CategoryFormDialog';
 import { Button } from '../../../components/ui/Button';
@@ -14,8 +13,6 @@ export function CategoriesManagement() {
   const { categories, loading } = useCategories();
   const activeCategories = categories.filter(c => !c.isArchived);
   const { user } = useAuth();
-  const { isDemo } = useDemo();
-  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>(undefined);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -73,8 +70,6 @@ export function CategoriesManagement() {
         <Button 
           onClick={handleOpenAdd} 
           className="shrink-0 flex items-center gap-2"
-          disabled={isDemo}
-          title={isDemo ? "Disabled in Demo Mode" : undefined}
         >
           <Plus className="h-4 w-4" />
           Add Category
@@ -120,16 +115,16 @@ export function CategoriesManagement() {
                     <button
                       onClick={() => handleOpenEdit(cat)}
                       className="p-1.5 hover:bg-accent rounded-md text-muted-foreground transition-colors disabled:opacity-50"
-                      disabled={isDeleting === cat.id || isDemo}
-                      title={isDemo ? "Disabled in Demo Mode" : "Edit category"}
+                      disabled={isDeleting === cat.id}
+                      title="Edit category"
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(cat.id)}
                       className="p-1.5 hover:bg-destructive/10 rounded-md text-destructive transition-colors disabled:opacity-50"
-                      disabled={isDeleting === cat.id || isDemo}
-                      title={isDemo ? "Disabled in Demo Mode" : "Archive category"}
+                      disabled={isDeleting === cat.id}
+                      title="Archive category"
                     >
                       {isDeleting === cat.id ? (
                         <LoadingSpinner className="h-4 w-4" />

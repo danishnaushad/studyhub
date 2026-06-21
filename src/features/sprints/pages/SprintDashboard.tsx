@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { Target, Plus, Activity, Trash2, PauseCircle, PlayCircle, CheckCircle2, X, Edit2 } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { useSprints } from '../hooks/useSprints';
@@ -11,13 +12,11 @@ import { DatePicker } from '../../../components/ui/DatePicker';
 import { getCategoryColor } from '../../../lib/colors';
 import { getLocalYYYYMMDD } from '../../../lib/date';
 import { SprintEducationCard } from '../components/SprintEducationCard';
-import { useDemo } from '../../../contexts/DemoContext';
+
 
 export function SprintDashboard() {
   const { sprints, loading, error } = useSprints();
   const { categories, loading: catsLoading } = useCategories();
-  const { isDemo } = useDemo();
-  
   const todayStr = getLocalYYYYMMDD(new Date());
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -158,8 +157,6 @@ export function SprintDashboard() {
         <Button 
           onClick={() => setIsCreateModalOpen(true)} 
           className="w-full sm:w-auto shadow-md hover:shadow-lg transition-all"
-          disabled={isDemo}
-          title={isDemo ? "Disabled in Demo Mode" : undefined}
         >
           <Plus className="mr-2 h-5 w-5" />
           Create Sprint
@@ -179,8 +176,6 @@ export function SprintDashboard() {
             onClick={() => setIsCreateModalOpen(true)} 
             size="lg" 
             className="shadow-md"
-            disabled={isDemo}
-            title={isDemo ? "Disabled in Demo Mode" : undefined}
           >
             Launch Your First Sprint
           </Button>
@@ -414,14 +409,13 @@ export function SprintDashboard() {
 }
 
 function SprintCard({ sprint, category, onUpdateStatus, onDelete, onEdit }: { sprint: Sprint, category?: any, onUpdateStatus: (status: Sprint['status']) => void, onDelete: () => void, onEdit: () => void }) {
-  const { isDemo } = useDemo();
-  const isPast = sprint.status === 'completed' || sprint.status === 'failed';
   
   const totalTarget = sprint.targetValue;
   const current = sprint.currentValue;
   const progressPercent = Math.min(100, Math.max(0, Math.round(((current - sprint.initialValue) / totalTarget) * 100)));
   
   const now = Date.now();
+  const isPast = sprint.targetDate < now;
   const daysRemaining = Math.max(0, Math.ceil((sprint.targetDate - now) / (1000 * 60 * 60 * 24)));
   const sprintDaysElapsed = Math.max(1, Math.ceil((now - sprint.startDate) / (1000 * 60 * 60 * 24)));
   
@@ -547,26 +541,26 @@ function SprintCard({ sprint, category, onUpdateStatus, onDelete, onEdit }: { sp
 
       <div className="flex justify-end gap-2 mt-4">
         {sprint.status === 'active' && (
-          <Button variant="outline" size="sm" onClick={() => onUpdateStatus('paused')} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
+          <Button variant="outline" size="sm" onClick={() => onUpdateStatus('paused')}>
             <PauseCircle className="h-4 w-4 mr-1" /> Pause
           </Button>
         )}
         {sprint.status === 'paused' && (
-          <Button variant="outline" size="sm" onClick={() => onUpdateStatus('active')} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
+          <Button variant="outline" size="sm" onClick={() => onUpdateStatus('active')}>
             <PlayCircle className="h-4 w-4 mr-1" /> Resume
           </Button>
         )}
         {(sprint.status === 'active' || sprint.status === 'paused') && (
           <>
-            <Button variant="outline" size="sm" onClick={onEdit} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
+            <Button variant="outline" size="sm" onClick={onEdit}>
               <Edit2 className="h-4 w-4 mr-1" /> Edit
             </Button>
-            <Button variant="outline" size="sm" className="text-green-500 hover:text-green-600 hover:bg-green-500/10" onClick={() => onUpdateStatus('completed')} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
+            <Button variant="outline" size="sm" className="text-green-500 hover:text-green-600 hover:bg-green-500/10" onClick={() => onUpdateStatus('completed')}>
               <CheckCircle2 className="h-4 w-4 mr-1" /> Done
             </Button>
           </>
         )}
-        <Button variant="ghost" size="sm" className="text-destructive hover:bg-destructive/10 px-2 disabled:opacity-50" onClick={onDelete} disabled={isDemo} title={isDemo ? "Disabled in Demo Mode" : undefined}>
+        <Button variant="ghost" size="sm" className="text-destructive hover:bg-destructive/10 px-2 disabled:opacity-50" onClick={onDelete}>
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { Login } from '../features/auth/pages/Login';
@@ -16,10 +16,6 @@ import { WorkspaceProjects } from '../features/workspace/pages/WorkspaceProjects
 import { WorkspaceAnalytics } from '../features/workspace/pages/WorkspaceAnalytics';
 import { CategoriesManagement } from '../features/categories/pages/CategoriesManagement';
 import { SprintDashboard } from '../features/sprints/pages/SprintDashboard';
-import { DemoLayout } from '../components/layout/DemoLayout';
-
-const isAuditMode = import.meta.env.VITE_AUDIT_MODE === 'true';
-
 export function AppRoutes() {
   return (
     <Routes>
@@ -29,24 +25,7 @@ export function AppRoutes() {
         <Route path="/register" element={<Register />} />
       </Route>
 
-      {/* Demo Routes - only visible if VITE_AUDIT_MODE is true */}
-      {isAuditMode && (
-        <Route path="/demo" element={<DemoLayout />}>
-          <Route element={<DashboardLayout><Outlet /></DashboardLayout>}>
-            <Route index element={<Dashboard />} />
-            <Route path="categories" element={<CategoriesManagement />} />
-            <Route path="sprints" element={<SprintDashboard />} />
-            <Route path="category/:categoryId" element={<WorkspaceLayout />}>
-              <Route path="overview" element={<WorkspaceOverview />} />
-              <Route path="resources" element={<WorkspaceResources />} />
-              <Route path="notes" element={<WorkspaceNotes />} />
-              <Route path="questions" element={<WorkspaceQuestions />} />
-              <Route path="projects" element={<WorkspaceProjects />} />
-              <Route path="analytics" element={<WorkspaceAnalytics />} />
-            </Route>
-          </Route>
-        </Route>
-      )}
+
 
       {/* Onboarding - Protected but requires incomplete onboarding */}
       <Route 

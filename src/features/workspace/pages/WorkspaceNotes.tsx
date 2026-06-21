@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { Plus, Search, FileText } from 'lucide-react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useAuth } from '../../../hooks/useAuth';
-import { useDemo } from '../../../contexts/DemoContext';
 import { useNotes } from '../hooks/useNotes';
 import { notesService } from '../services/notes.service';
 import { NoteCard } from '../components/NoteCard';
@@ -14,7 +13,6 @@ import type { Note } from '../../../types';
 export function WorkspaceNotes() {
   const { category } = useWorkspace();
   const { user } = useAuth();
-  const { isDemo } = useDemo();
   const { notes, loading } = useNotes(category.id);
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,8 +81,6 @@ export function WorkspaceNotes() {
           <Button 
             onClick={handleOpenAdd} 
             className="shrink-0 flex items-center gap-2"
-            disabled={isDemo}
-            title={isDemo ? "Disabled in Demo Mode" : undefined}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">New Note</span>
