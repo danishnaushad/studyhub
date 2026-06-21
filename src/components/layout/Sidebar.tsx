@@ -10,20 +10,24 @@ import {
   Settings,
   LogOut,
   Target,
-  Map
+  Map,
+  Brain,
+  Sparkles
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { authService } from '../../features/auth/services/auth.service';
 
 const navigation = [
-  { name: 'Mission Control', href: '/', icon: LayoutDashboard, disabled: false },
-  { name: 'Sprint Zone', href: '/sprints', icon: Target, disabled: false },
-  { name: 'Learning Hub', href: '/learning', icon: BookOpen, disabled: true },
-  { name: 'Focus Sessions', href: '/focus', icon: Focus, disabled: true },
-  { name: 'Categories', href: '/categories', icon: Layers, disabled: false },
-  { name: 'Questions Vault', href: '/vault', icon: HelpCircle, disabled: false },
-  { name: 'Study OS Roadmap', href: '/roadmap', icon: Map, disabled: false },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3, disabled: true },
+  { name: 'Mission Control', href: '/', icon: LayoutDashboard },
+  { name: 'Sprint Zone', href: '/sprints', icon: Target },
+  { name: 'Categories', href: '/categories', icon: Layers },
+  { name: 'Questions Vault', href: '/vault', icon: HelpCircle },
+  { name: 'Focus Sessions', href: '/focus', icon: Focus },
+  { name: 'Knowledge Trainer', href: '/trainer', icon: Brain },
+  { name: 'Learning Hub', href: '/learning', icon: BookOpen },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Study OS Roadmap', href: '/roadmap', icon: Map },
+  { name: 'Study OS Ecosystem', href: '/ecosystem', icon: Sparkles },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -41,14 +45,12 @@ export const Sidebar: React.FC = () => {
           {navigation.map((item) => (
             <NavLink
               key={item.name}
-              to={item.disabled ? '#' : item.href}
-              onClick={(e) => item.disabled && e.preventDefault()}
+              to={item.href}
               className={({ isActive }) =>
                 cn(
-                  isActive && !item.disabled
+                  isActive
                     ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                  item.disabled && 'opacity-50 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground',
                   'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors'
                 )
               }
@@ -60,9 +62,6 @@ export const Sidebar: React.FC = () => {
                 aria-hidden="true"
               />
               {item.name}
-              {item.disabled && (
-                <span className="ml-auto text-[10px] uppercase tracking-wider font-semibold opacity-50">Soon</span>
-              )}
             </NavLink>
           ))}
         </nav>
@@ -70,14 +69,12 @@ export const Sidebar: React.FC = () => {
         <div className="space-y-1 pt-6 border-t">
           <NavLink
             to="/settings"
-            onClick={(e) => e.preventDefault()}
             className={cn(
-              'text-muted-foreground opacity-50 cursor-not-allowed group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors'
+              'text-muted-foreground hover:bg-accent hover:text-accent-foreground group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors'
             )}
           >
             <Settings className="mr-3 h-5 w-5 flex-shrink-0" />
             Settings
-            <span className="ml-auto text-[10px] uppercase tracking-wider font-semibold opacity-50">Soon</span>
           </NavLink>
           <button
             onClick={handleLogout}

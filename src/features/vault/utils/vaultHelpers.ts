@@ -75,22 +75,4 @@ export function computeVaultStats(questions: Question[]) {
   };
 }
 
-/** Mock data for UI skeleton / UAT testing */
-export const MOCK_QUESTIONS: Question[] = [
-  { id: 'mock-1', userId: 'u1', categoryId: 'cat-1', question: 'What is SQL injection?', answer: 'A code injection technique that exploits SQL vulnerabilities in web applications.', type: 'concept_review', status: 'learning', reviewCount: 3, masteryScore: 25, createdAt: Date.now() - 86400000 * 5, updatedAt: Date.now() - 86400000, lastReviewed: Date.now() - 86400000, nextReview: Date.now() - 3600000 },
-  { id: 'mock-2', userId: 'u1', categoryId: 'cat-1', question: 'What does XSS stand for?', answer: 'Cross-Site Scripting', type: 'fill_blank', status: 'review', reviewCount: 7, masteryScore: 55, createdAt: Date.now() - 86400000 * 10, updatedAt: Date.now() - 86400000 * 2, lastReviewed: Date.now() - 86400000 * 2, nextReview: Date.now() + 86400000 },
-  { id: 'mock-3', userId: 'u1', categoryId: 'cat-2', question: 'Is Python dynamically typed?', answer: 'Yes', type: 'concept_review', status: 'mastered', reviewCount: 12, masteryScore: 95, createdAt: Date.now() - 86400000 * 20, updatedAt: Date.now() - 86400000 * 3, lastReviewed: Date.now() - 86400000 * 3, nextReview: Date.now() + 86400000 * 14 },
-  { id: 'mock-4', userId: 'u1', categoryId: 'cat-1', question: 'What is a CSRF attack?', answer: 'Cross-Site Request Forgery — forces an authenticated user to submit unintended requests.', type: 'concept_review', status: 'learning', reviewCount: 1, masteryScore: 10, createdAt: Date.now() - 86400000 * 2, updatedAt: Date.now() - 86400000, lastReviewed: Date.now() - 86400000, nextReview: Date.now() - 7200000, sourceResourceTitle: 'OWASP Guide.pdf', sourcePageNumber: 42, sourceHighlightText: 'CSRF is an attack that forces end users to execute unwanted actions' },
-  { id: 'mock-5', userId: 'u1', categoryId: 'cat-2', question: 'What is a Python decorator?', answer: 'A function that takes another function and extends its behavior without modifying it.', type: 'concept_review', status: 'review', reviewCount: 5, masteryScore: 60, createdAt: Date.now() - 86400000 * 8, updatedAt: Date.now() - 86400000 * 1, lastReviewed: Date.now() - 86400000, nextReview: Date.now() },
-  { id: 'mock-6', userId: 'u1', categoryId: 'cat-3', question: 'What port does HTTPS use?', answer: '443', type: 'fill_blank', status: 'mastered', reviewCount: 10, masteryScore: 100, createdAt: Date.now() - 86400000 * 30, updatedAt: Date.now() - 86400000 * 5, lastReviewed: Date.now() - 86400000 * 5, nextReview: Date.now() + 86400000 * 30 },
-  { id: 'mock-7', userId: 'u1', categoryId: 'cat-3', question: 'What layer does TCP operate on?', answer: 'Transport Layer (Layer 4)', type: 'concept_review', status: 'learning', reviewCount: 0, masteryScore: 0, createdAt: Date.now() - 86400000, updatedAt: Date.now() - 86400000, lastReviewed: null, nextReview: null },
-  { id: 'mock-8', userId: 'u1', categoryId: 'cat-1', question: 'Which HTTP method is idempotent?', answer: 'GET, PUT, DELETE', type: 'concept_review', status: 'review', reviewCount: 8, masteryScore: 45, createdAt: Date.now() - 86400000 * 15, updatedAt: Date.now() - 86400000, lastReviewed: Date.now() - 86400000, nextReview: Date.now() },
-  { id: 'mock-9', userId: 'u1', categoryId: 'cat-2', question: 'What is list comprehension in Python?', answer: 'A concise way to create lists: [expr for item in iterable if condition]', type: 'concept_review', status: 'mastered', reviewCount: 9, masteryScore: 90, createdAt: Date.now() - 86400000 * 25, updatedAt: Date.now() - 86400000 * 4, lastReviewed: Date.now() - 86400000 * 4, nextReview: Date.now() + 86400000 * 21 },
-  { id: 'mock-10', userId: 'u1', categoryId: 'cat-1', question: 'What is the difference between authentication and authorization?', answer: 'Authentication verifies identity; authorization determines access permissions.', type: 'concept_review', status: 'learning', reviewCount: 2, masteryScore: 15, createdAt: Date.now() - 86400000 * 3, updatedAt: Date.now() - 86400000, lastReviewed: Date.now() - 86400000, nextReview: Date.now() - 1800000 },
-];
 
-export const MOCK_CATEGORIES = [
-  { id: 'cat-1', name: 'Cyber Security', color: 'red' },
-  { id: 'cat-2', name: 'Python', color: 'green' },
-  { id: 'cat-3', name: 'Networking', color: 'blue' },
-];

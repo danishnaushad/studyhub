@@ -21,6 +21,19 @@ import { VaultDashboard } from '../features/vault/pages/VaultDashboard';
 import { VaultCards } from '../features/vault/pages/VaultCards';
 import { VaultAnalytics } from '../features/vault/pages/VaultAnalytics';
 import { RoadmapDashboard } from '../features/roadmap/pages/RoadmapDashboard';
+import { EcosystemDashboard } from '../features/skeletons/pages/EcosystemDashboard';
+import { LearningHubSkeleton } from '../features/skeletons/pages/LearningHubSkeleton';
+import { KnowledgeTrainerSkeleton } from '../features/skeletons/pages/KnowledgeTrainerSkeleton';
+import { AnalyticsSkeleton } from '../features/skeletons/pages/AnalyticsSkeleton';
+import { AIToolsSkeleton } from '../features/skeletons/pages/AIToolsSkeleton';
+import { PDFSystemSkeleton } from '../features/skeletons/pages/PDFSystemSkeleton';
+import { ProjectVaultSkeleton } from '../features/skeletons/pages/ProjectVaultSkeleton';
+import { CalendarSkeleton } from '../features/skeletons/pages/CalendarSkeleton';
+import { NotificationsSkeleton } from '../features/skeletons/pages/NotificationsSkeleton';
+import { SubscriptionSkeleton } from '../features/skeletons/pages/SubscriptionSkeleton';
+import { AdminSkeleton } from '../features/skeletons/pages/AdminSkeleton';
+import { CloudSyncSkeleton } from '../features/skeletons/pages/CloudSyncSkeleton';
+
 export function AppRoutes() {
   return (
     <Routes>
@@ -94,7 +107,7 @@ export function AppRoutes() {
         <Route path="analytics" element={<VaultAnalytics />} />
       </Route>
 
-      {/* Roadmap */}
+      {/* Roadmap & Ecosystem */}
       <Route
         path="/roadmap"
         element={
@@ -105,6 +118,34 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/ecosystem"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <EcosystemDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Skeletons */}
+      <Route path="/learning" element={<ProtectedRoute><DashboardLayout><LearningHubSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/trainer" element={<ProtectedRoute><DashboardLayout><KnowledgeTrainerSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/analytics" element={<ProtectedRoute><DashboardLayout><AnalyticsSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/ai" element={<ProtectedRoute><DashboardLayout><AIToolsSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/pdf" element={<ProtectedRoute><DashboardLayout><PDFSystemSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/projects" element={<ProtectedRoute><DashboardLayout><ProjectVaultSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/calendar" element={<ProtectedRoute><DashboardLayout><CalendarSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute><DashboardLayout><NotificationsSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/subscription" element={<ProtectedRoute><DashboardLayout><SubscriptionSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/admin" element={<ProtectedRoute><DashboardLayout><AdminSkeleton /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/sync" element={<ProtectedRoute><DashboardLayout><CloudSyncSkeleton /></DashboardLayout></ProtectedRoute>} />
+      
+      {/* Focus & Settings (Basic fallbacks to prevent 404 since they were enabled in sidebar) */}
+      <Route path="/focus" element={<ProtectedRoute><DashboardLayout><div className="p-8">Focus Session UI is floating via TimerEngine. Check bottom right!</div></DashboardLayout></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><DashboardLayout><div className="p-8 text-center text-muted-foreground">Settings Page Coming Soon</div></DashboardLayout></ProtectedRoute>} />
+
 
       {/* Category Workspace */}
       <Route 

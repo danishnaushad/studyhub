@@ -9,6 +9,7 @@ import {
   Layers, Sparkles, FileText, BarChart3, Trophy, Globe, ArrowRight,
   BookOpen, Edit3, HelpCircle, Brain, Award, Shield, Server, Box, Network
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '../../../lib/utils';
 
 function StatusBadge({ status }: { status: ModuleStatus }) {
@@ -40,6 +41,30 @@ export function RoadmapDashboard() {
   const plannedModules = ROADMAP_MODULES.filter(m => m.status === 'Planning' || m.status === 'Architecture Approved' || m.status === 'Future').length;
   const frozenModules = ROADMAP_MODULES.filter(m => m.status === 'Frozen').length;
   const overallProgress = Math.round(ROADMAP_MODULES.reduce((acc, m) => acc + m.progress, 0) / ROADMAP_MODULES.length);
+
+  const navigate = useNavigate();
+
+  const getModuleRoute = (id: string) => {
+    const routeMap: Record<string, string> = {
+      'dashboard': '/',
+      'categories': '/categories',
+      'sprints': '/sprints',
+      'focus': '/focus',
+      'vault': '/vault',
+      'learning': '/learning',
+      'knowledge': '/trainer',
+      'analytics': '/analytics',
+      'ai-tools': '/ai',
+      'pdf-system': '/pdf',
+      'projects': '/projects',
+      'calendar': '/calendar',
+      'notifications': '/notifications',
+      'subscriptions': '/subscription',
+      'admin': '/admin',
+      'sync': '/sync'
+    };
+    return routeMap[id] || null;
+  };
 
   const renderIcon = (name: string, className?: string) => {
     const icons: Record<string, React.ElementType> = {
@@ -351,8 +376,17 @@ export function RoadmapDashboard() {
                 </div>
                 
                 <div className="grid gap-4">
-                  {ROADMAP_MODULES.map(module => (
-                    <div key={module.id} className="p-5 rounded-xl border bg-card/50 hover:bg-card hover:border-primary/30 transition-colors">
+                  {ROADMAP_MODULES.map(module => {
+                    const route = getModuleRoute(module.id);
+                    return (
+                    <div 
+                      key={module.id} 
+                      onClick={() => route && navigate(route)}
+                      className={cn(
+                        "p-5 rounded-xl border bg-card/50 transition-colors",
+                        route ? "cursor-pointer hover:bg-card hover:border-primary/30" : "opacity-80 cursor-default"
+                      )}
+                    >
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="flex-1 min-w-0 w-full">
                           <div className="flex items-center gap-3 mb-2">
@@ -386,7 +420,7 @@ export function RoadmapDashboard() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               </CardContent>
             </Card>
