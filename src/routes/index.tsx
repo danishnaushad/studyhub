@@ -16,6 +16,10 @@ import { WorkspaceProjects } from '../features/workspace/pages/WorkspaceProjects
 import { WorkspaceAnalytics } from '../features/workspace/pages/WorkspaceAnalytics';
 import { CategoriesManagement } from '../features/categories/pages/CategoriesManagement';
 import { SprintDashboard } from '../features/sprints/pages/SprintDashboard';
+import { VaultLayout } from '../features/vault/layouts/VaultLayout';
+import { VaultDashboard } from '../features/vault/pages/VaultDashboard';
+import { VaultCards } from '../features/vault/pages/VaultCards';
+import { VaultAnalytics } from '../features/vault/pages/VaultAnalytics';
 export function AppRoutes() {
   return (
     <Routes>
@@ -72,6 +76,22 @@ export function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+
+      {/* Questions Vault */}
+      <Route
+        path="/vault"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <VaultLayout />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<VaultDashboard />} />
+        <Route path="cards" element={<VaultCards />} />
+        <Route path="analytics" element={<VaultAnalytics />} />
+      </Route>
 
       {/* Category Workspace */}
       <Route 

@@ -20,7 +20,7 @@ const navigation = [
   { name: 'Learning Hub', href: '/learning', icon: BookOpen, disabled: true },
   { name: 'Focus Sessions', href: '/focus', icon: Focus, disabled: true },
   { name: 'Categories', href: '/categories', icon: Layers, disabled: false },
-  { name: 'Questions Vault', href: '/vault', icon: HelpCircle, disabled: true },
+  { name: 'Questions Vault', href: '/vault', icon: HelpCircle, disabled: false },
   { name: 'Analytics', href: '/analytics', icon: BarChart3, disabled: true },
 ];
 
